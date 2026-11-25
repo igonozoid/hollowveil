@@ -94,11 +94,17 @@ O **Saguão** é o centro de tudo: a escadaria, o retrato de Morvant (cujos olho
 | **Sala de jantar** | **A Ceia** | Plano de mesa por lógica: 7 convidados, 7 cadeiras e pistas escritas por Celeste | Disposição e conjunto mínimo de pistas com solução única |
 | **Biblioteca** | **O Atlas** | Quebra-cabeça deslizante 4×4 com o rosto meio esfolado de Morvant | Embaralhamento sempre solucionável |
 | **Cozinha** | **Olhos no Pote** | Resta-um triangular com 15 olhos em conserva: pular um olho o estoura | Buraco inicial, sempre com solução verificada por um solucionador |
-| Sala de música | A Partitura | Repetir uma frase do canto de Celeste em teclas desafinadas | Melodia |
-| Estufa | As Veias | Variação de "apague as luzes" com raízes que pulsam | Estado inicial |
-| Saguão | A Prancheta | Cifra de letras com o alfabeto da mesa girante | Mensagem e chave |
+| **Sala de música** | **A Partitura** | Repetir o canto de Celeste em teclas desafinadas, em 4 rodadas que crescem | Melodia (sem nota repetida em seguida) |
+| **Estufa** | **As Veias** | "Apague as luzes" 5×5: tocar um bulbo inverte ele e os vizinhos | Estado inicial, sempre solucionável (solucionador em GF(2)) |
+| **Saguão** | **A Prancheta** | Cifra com dois deslocamentos alternados, decifrada girando os anéis do Sol e da Lua | Mensagem e as duas chaves |
 
 Demais andares (rascunho): pesos e órgãos em balança, labirinto em primeira pessoa nas fundações, peças de xadrez com bisturis, caixas de música com engrenagens, transvaso de sangue entre frascos, ganchos de carne num quebra-cabeça de empurrar caixas na câmara fria e a montagem final do corpo no Teatro Anatômico.
+
+Ligações do térreo:
+- **Caminho 1:** a Ceia dá a chave de osso, que abre a biblioteca. O Atlas destranca a copa. Olhos no Pote libera a escada de serviço.
+- **Caminho 2:** a estufa devolve a lente da Prancheta. A cifra da Prancheta destranca a sala de música, onde fica a Partitura.
+
+Os dois caminhos podem ser jogados em paralelo, em qualquer ordem.
 
 ## 7. Arte
 

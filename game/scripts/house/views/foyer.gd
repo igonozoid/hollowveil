@@ -83,7 +83,10 @@ func paint() -> void:
 		hot(library, "walk", "go:library", "Biblioteca")
 	else:
 		hot(library, "locked", "locked:library", "Biblioteca")
-	hot(board.grow(6), "voice", "event:planchette", "A Prancheta")
+	if State.flag("prancheta_ready") and not State.is_solved("prancheta"):
+		hot(board.grow(6), "puzzle", "event:planchette", "A Prancheta (a lente brilha)")
+	else:
+		hot(board.grow(6), "voice", "event:planchette", "A Prancheta")
 	hot_back("go:foyer_door", "Virar-se")
 
 

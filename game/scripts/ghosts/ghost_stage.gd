@@ -317,6 +317,9 @@ func _draw_actor(a: Actor) -> void:
 			for i in 6:
 				var tp := hand + dir * (4.0 + i * 2.4)
 				draw_rect(Rect2(tp + dir.orthogonal() * 2.0, Vector2(1, 1)), Color(0.8, 0.8, 0.85))
+		"bisturi":
+			draw_line(hand, hand + dir * 6.0, Color(0.85, 0.87, 0.9), 1.0)
+			draw_rect(Rect2(hand + dir * 6.0 - Vector2(0.5, 0.5), Vector2(1, 1)), Color(1, 1, 1))
 		"colher":
 			draw_line(hand, hand + dir * 7.0, Color(0.7, 0.7, 0.72), 1.0)
 			draw_circle(hand + dir * 8.0, 1.5, Color(0.7, 0.7, 0.72))
@@ -431,6 +434,30 @@ func _props_olhos() -> void:
 	for x in [300, 340, 380]:
 		draw_line(Vector2(x, 40), Vector2(x, 90 + sin(t + x) * 2), Color(0.3, 0.3, 0.3), 1.0)
 		draw_colored_polygon(PackedVector2Array([Vector2(x - 6, 92), Vector2(x + 6, 92), Vector2(x + 8, 120), Vector2(x, 140), Vector2(x - 8, 120)]), Color(0.42, 0.12, 0.1))
+
+
+func _props_partitura() -> void:
+	_wall(Color(0.14, 0.07, 0.14), Color(0.08, 0.04, 0.08), Color(0.11, 0.05, 0.11))
+	# Palco e cortinas
+	draw_rect(Rect2(150, 244, 360, 32), Color(0.2, 0.1, 0.06))
+	draw_rect(Rect2(150, 240, 360, 5), Color(0.32, 0.17, 0.1))
+	for side in [0, 1]:
+		var x0 := 120.0 if side == 0 else 470.0
+		for k in 6:
+			draw_rect(Rect2(x0 + k * 8, 30, 8, 214), Color(0.45, 0.05, 0.08).darkened(0.15 * (k % 2)))
+	draw_rect(Rect2(120, 24, 400, 22), Color(0.5, 0.06, 0.09))
+	# Foco de luz sobre a cantora
+	draw_colored_polygon(PackedVector2Array([Vector2(310, 30), Vector2(330, 30), Vector2(380, 244), Vector2(260, 244)]), Color(1.0, 0.9, 0.7, 0.06))
+	# Piano de cauda à direita do palco
+	draw_rect(Rect2(400, 196, 70, 14), Color(0.04, 0.03, 0.03))
+	draw_colored_polygon(PackedVector2Array([Vector2(400, 196), Vector2(470, 196), Vector2(440, 160)]), Color(0.06, 0.05, 0.05))
+	for x in [406, 462]:
+		draw_rect(Rect2(x, 210, 3, 30), Color(0.04, 0.03, 0.03))
+	_candles(450, 196)
+	# Primeira fila da plateia
+	for x in [60, 100, 560, 600]:
+		draw_rect(Rect2(x, 236, 4, 40), Color(0.22, 0.09, 0.08))
+		draw_rect(Rect2(x - 12, 254, 16, 4), Color(0.22, 0.09, 0.08))
 
 
 # ---------------------------------------------------------------- roteiros
@@ -639,6 +666,73 @@ func scene_olhos() -> void:
 	else:
 		_say("BENEDITA", "A tranca da escada de serviço é minha. Pode subir, moça. Mas não olhe para trás.")
 	await _w(4.4)
+	_tw(soul, "alpha", 0.0, 1.0)
+	await _w(1.2)
+	_end()
+
+
+func scene_partitura() -> void:
+	prop_draw = _props_partitura
+	surfaces = [Rect2(150, 240, 360, 5)]
+	blood.floor_y = 241.0
+	blood.walls = [Rect2(120, 30, 400, 210)]
+	var cel := _actor("cel", {"x": 320.0, "y": 241.0, "facing": -1.0, "kind": "woman", "arm_f": 0.5, "arm_b": 0.3, "alpha": 0.85})
+	var host := _actor("host", {"x": 40.0, "facing": 1.0, "kind": "host"})
+	await _w(1.2)
+	_say("CELESTE", "A ária nova, Ezequiel. Escrevi pensando em Ofélia.")
+	await _w(3.0)
+	# Ela canta: braços se abrem devagar.
+	_tw(cel, "arm_f", 1.6, 2.5)
+	_tw(cel, "arm_b", 1.3, 2.5)
+	for i in 6:
+		_sfx("whisper", -10.0, 1.6 + i * 0.1)
+		await _w(0.6)
+	_walk_to(host, 250.0, 3.0)
+	await _w(1.0)
+	_say("MORVANT", "Bravo. Bravíssimo. Essa voz não pode morrer com você, minha querida.")
+	await _w(2.6)
+	_tw(host, "y", 241.0, 0.3)
+	host.tool = "bisturi"
+	_walk_to(host, 304.0, 0.8)
+	await _w(0.9)
+	_say("CELESTE", "Ezequiel? O que é isso na sua m...")
+	await _w(1.0)
+	_tw(host, "arm_f", 2.2, 0.12)
+	await _w(0.12)
+	_sfx("squelch", 0.0, 1.3)
+	_sfx("scream", -6.0, 1.4)
+	_shake(0.9)
+	flash = 0.35
+	var neck := part("cel", "neck")
+	blood.spray(neck, Vector2(1, -0.2), 70, 230.0, 0.35, 2.2)
+	blood.spray(neck, Vector2(-1, -0.4), 30, 160.0, 0.6, 1.6)
+	cel.tremble = 1.0
+	_tw(cel, "arm_f", 2.6, 0.3)
+	await _w(0.5)
+	# Ela tenta cantar e só sai sangue.
+	for i in 5:
+		_sfx("cough", -8.0, 1.4 + i * 0.05)
+		blood.spray(part("cel", "neck"), Vector2(1, 0.1), 16, 130.0, 0.4)
+		blood.drip(part("cel", "neck"), 60.0)
+		await _w(0.45)
+	cel.tremble = 0.0
+	_tw(cel, "fall", 1.0, 0.9)
+	await _w(1.0)
+	_sfx("slam", -6.0, 1.1)
+	blood.pool(Vector2(cel.x + 36, 241.0), 28.0)
+	await _w(0.8)
+	_say("MORVANT", "Shh. A melhor parte de uma ária é o silêncio depois dela.")
+	await _w(3.6)
+	var soul := _actor("soul", {"x": 340.0, "y": 241.0, "facing": -1.0, "kind": "woman", "alpha": 0.0})
+	_tw(soul, "alpha", 0.75, 1.5)
+	_tw(soul, "rise", 40.0, 2.5)
+	_sfx("whisper", -4.0, 0.7)
+	await _w(2.0)
+	if host_version:
+		_say("MORVANT", "Ela agradeceria, médium. Mas eu fiquei com a voz dela, lembra?")
+	else:
+		_say("CELESTE", "Ele guardou minha voz num vidro, lá em cima. Ofélia ouviu tudo. Ofélia ouve tudo.")
+	await _w(4.6)
 	_tw(soul, "alpha", 0.0, 1.0)
 	await _w(1.2)
 	_end()

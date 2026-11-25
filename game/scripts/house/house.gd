@@ -10,12 +10,19 @@ const VIEWS := {
 	"dining": preload("res://scripts/house/views/dining.gd"),
 	"library": preload("res://scripts/house/views/library.gd"),
 	"kitchen": preload("res://scripts/house/views/kitchen.gd"),
+	"greenhouse": preload("res://scripts/house/views/greenhouse.gd"),
+	"music": preload("res://scripts/house/views/music.gd"),
 }
 const PUZZLES := {
 	"ceia": preload("res://scripts/puzzles/ceia.gd"),
 	"atlas": preload("res://scripts/puzzles/atlas.gd"),
 	"olhos": preload("res://scripts/puzzles/olhos.gd"),
+	"veias": preload("res://scripts/puzzles/veias.gd"),
+	"prancheta": preload("res://scripts/puzzles/prancheta.gd"),
+	"partitura": preload("res://scripts/puzzles/partitura.gd"),
 }
+## Enigmas que libertam uma alma (e têm cena de morte). Os outros só abrem caminho.
+const SOULS := ["ceia", "atlas", "olhos", "partitura"]
 const GhostStage := preload("res://scripts/ghosts/ghost_stage.gd")
 const Subtitles := preload("res://scripts/ui/subtitles.gd")
 const Hud := preload("res://scripts/ui/hud.gd")
@@ -30,12 +37,15 @@ const LOOK := {
 	"atlas_after": "O rosto da prancha agora está completo. E me olha.",
 	"stove": "No panelão ferve alguma coisa espessa. Não vou olhar dentro.",
 	"pantry_after": "Os potes que sobraram me acompanham com o olhar.",
+	"roots_after": "As raízes secaram em volta de uma mão. Ela segurava a lente da prancheta.",
+	"piano_music_after": "A tampa do piano ainda reflete alguém no palco. Não me viro para conferir.",
 }
 const LOCKED := {
 	"stairs": "Um peso no peito me empurra de volta. Ainda não.",
 	"library": "Trancada. A fechadura tem a forma de um dente.",
 	"pantry": "Travada por dentro. Do outro lado, alguém arrasta os pés.",
 	"service": "Uma tranca de ferro, sem buraco de chave. Só abre do outro lado.",
+	"music": "Trancada. Do outro lado, alguém afina a voz. Bato e o canto para.",
 }
 
 var view_root := Node2D.new()
@@ -224,7 +234,20 @@ func _on_solved(id: String) -> void:
 	if puzzle:
 		puzzle.queue_free()
 		puzzle = null
-	play_ghost(id, false)
+	after_solve(id, false)
+
+
+## Depois de resolver: cena de morte para as almas; recompensa direta para o resto.
+func after_solve(id: String, by_host: bool) -> void:
+	if id in SOULS:
+		play_ghost(id, by_host)
+		return
+	mode = "explore"
+	Audio.music(view.music)
+	if post:
+		post.grade("terreo")
+	view.queue_redraw()
+	_reward(id, by_host)
 
 
 # ---------------------------------------------------------------- cenas fantasmas
@@ -274,7 +297,21 @@ func _reward(id: String, by_host: bool) -> void:
 			subs.say("MORVANT", "Mãos tão bonitas. Seria um desperdício enterrá-las.")
 		"olhos":
 			hud.notify("ESCADA DE SERVIÇO\nA tranca caiu sozinha.")
-			subs.say("MORVANT", "Três já se foram. Suba, médium. Minha esposa está ensaiando.")
+			if State.is_solved("partitura"):
+				subs.say("MORVANT", "Quatro já se foram. Suba, médium. Minha filha não dorme há treze anos.")
+			else:
+				subs.say("MORVANT", "Três já se foram. Suba, médium. Ou fique, e ouça minha esposa ensaiar.")
+		"veias":
+			State.set_flag("prancheta_ready")
+			hud.notify("LENTE DE VIDRO\nA prancheta do saguão tem olho de novo.")
+			subs.say("MORVANT", "Ofélia plantou isso. Ela regava com o que tinha à mão.")
+		"prancheta":
+			State.set_flag("music_open")
+			hud.notify("SALA DE MÚSICA\nA porta destrancou com o seu nome.")
+			subs.say("MORVANT", "Celeste odeia plateia atrasada. Corra.")
+		"partitura":
+			hud.notify("A VOZ DE CELESTE\nLevada num vidro para o andar de cima.")
+			subs.say("MORVANT", "Agora ela canta só para mim. Lá em cima, onde a acústica é melhor.")
 	if by_host:
 		subs.say("DÁLIA", "Ele resolveu por mim. E levou alguma coisa junto... não lembro o rosto dela.")
 	State.save_game()
@@ -296,7 +333,15 @@ func _event(id: String) -> void:
 			subs.say("MORVANT", lines[int(State.play_time) % lines.size()])
 			State.change_sanity(-1.0)
 		"planchette":
-			_planchette()
+			if State.flag("prancheta_ready") and not State.is_solved("prancheta"):
+				open_puzzle("prancheta")
+			else:
+				_planchette()
+		"gramophone":
+			Audio.play("sting", -14.0, 1.6)
+			subs.say("", "O disco gira sozinho. Uma soprano canta, longe, e para no meio da frase.")
+			if State.is_solved("partitura"):
+				subs.say("CELESTE", "...lá em cima... no vidro...")
 		"stairs_up":
 			busy = true
 			Audio.play("door", -6.0, 0.8)
@@ -308,21 +353,36 @@ func _event(id: String) -> void:
 			slice_finished.emit()
 
 
+## Enigmas já alcançáveis e ainda abertos, na ordem em que costumam aparecer.
+func available_puzzles() -> Array:
+	var out: Array = []
+	var gates := {
+		"ceia": true, "veias": true,
+		"atlas": State.has("chave_osso"),
+		"olhos": State.flag("kitchen_open"),
+		"prancheta": State.flag("prancheta_ready"),
+		"partitura": State.flag("music_open"),
+	}
+	for id in ["ceia", "veias", "atlas", "prancheta", "olhos", "partitura"]:
+		if gates[id] and not State.is_solved(id):
+			out.append(id)
+	return out
+
+
 func _current_puzzle() -> String:
 	var last := String(State.flags.get("last_puzzle", ""))
 	if last != "" and not State.is_solved(last):
 		return last
-	if not State.is_solved("ceia"):
-		return "ceia"
-	if not State.is_solved("atlas"):
-		return "atlas"
-	if not State.is_solved("olhos"):
-		return "olhos"
-	return ""
+	var open := available_puzzles()
+	return open[0] if not open.is_empty() else ""
 
 
 func _planchette() -> void:
-	var target := _current_puzzle()
+	hint_for(_current_puzzle())
+
+
+## Pista para um enigma: nível 1 e 2 custam sanidade; no 3, Morvant resolve.
+func hint_for(target: String) -> void:
 	Audio.play("planchette", -2.0)
 	if target == "":
 		subs.say("", "A prancheta não se move. Os mortos daqui já disseram tudo.")
@@ -342,7 +402,10 @@ func _planchette() -> void:
 		Audio.play("laugh", -6.0, 0.85)
 		await subs.finished
 		State.mark_solved(target, true)
-		play_ghost(target, true)
+		if puzzle:
+			puzzle.queue_free()
+			puzzle = null
+		after_solve(target, true)
 
 
 # ---------------------------------------------------------------- modo de teste
@@ -353,7 +416,10 @@ func _qa_key(code: int) -> void:
 			var target := _current_puzzle()
 			if target != "":
 				State.mark_solved(target)
-				play_ghost(target, false)
+				if puzzle:
+					puzzle.queue_free()
+					puzzle = null
+				after_solve(target, false)
 		KEY_F7:
 			State.change_sanity(-15.0)
 		KEY_F8:

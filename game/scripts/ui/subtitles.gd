@@ -9,6 +9,7 @@ const COLORS := {
 	"LEOCÁDIA": Color(0.55, 0.95, 0.88),
 	"TOBIAS": Color(0.55, 0.95, 0.88),
 	"BENEDITA": Color(0.55, 0.95, 0.88),
+	"CELESTE": Color(0.55, 0.95, 0.88),
 	"": Color(0.75, 0.7, 0.62),
 }
 

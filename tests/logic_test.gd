@@ -67,6 +67,46 @@ func _run() -> void:
 		solvable = solvable and found
 		o.free()
 	check(unique, "Ceia tem solução única em 60 sementes (pistas: %d a %d)" % [min_clues, max_clues])
+	# Veias: o solucionador apaga tudo; Prancheta decifra; Partitura sem notas repetidas.
+	var Veias = load("res://scripts/puzzles/veias.gd")
+	var Prancheta = load("res://scripts/puzzles/prancheta.gd")
+	var Partitura = load("res://scripts/puzzles/partitura.gd")
+	var veias_ok := true
+	var cipher_ok := true
+	var melody_ok := true
+	for s in 60:
+		State.seed_value = s * 104729
+		State.drafts = {}
+		var v = Veias.new()
+		v.build()
+		var plan: Array = v.solve()
+		for cell in plan:
+			v._toggle(cell, false)
+		veias_ok = veias_ok and not plan.is_empty() and v._all_dark()
+		v.free()
+		var pr = Prancheta.new()
+		pr.build()
+		cipher_ok = cipher_ok and pr.decoded() != pr.plain
+		pr.ring = pr.key.duplicate()
+		cipher_ok = cipher_ok and pr.decoded() == pr.plain and pr.cipher != pr.plain
+		pr.free()
+		var pa = Partitura.new()
+		var rng3 := RandomNumberGenerator.new()
+		rng3.seed = State.puzzle_seed("partitura")
+		var last := -1
+		var mel: Array = []
+		for i in 7:
+			var k := rng3.randi_range(0, 7)
+			while k == last:
+				k = rng3.randi_range(0, 7)
+			mel.append(k)
+			last = k
+		for i in 6:
+			melody_ok = melody_ok and mel[i] != mel[i + 1]
+		pa.free()
+	check(veias_ok, "As Veias: o solucionador murcha todos os bulbos em 60 sementes")
+	check(cipher_ok, "A Prancheta: só a chave certa decifra a mensagem, em 60 sementes")
+	check(melody_ok, "A Partitura: nenhuma nota repetida em seguida")
 	check(solvable, "Olhos no Pote tem saída em 60 sementes")
 
 	# 2. Prancheta: pista 1, pista 2, e na terceira Morvant resolve.
@@ -128,12 +168,53 @@ func _run() -> void:
 			locked = true
 	check(locked, "Copa trancada antes do Atlas")
 
-	# 6. Salvar e carregar.
+	# 6. Cadeia estufa → prancheta → sala de música → cena de Celeste.
+	h.subs.clear()
+	check(not State.flag("music_open"), "Sala de música começa trancada")
+	State.mark_solved("veias")
+	h.after_solve("veias", false)
+	await w(0.2)
+	check(State.flag("prancheta_ready"), "Estufa devolve a lente da prancheta")
+	h._event("planchette")
+	await w(0.5)
+	check(h.mode == "puzzle" and h.puzzle != null and h.puzzle.has_method("decoded"), "Prancheta com lente abre a cifra")
+	var pz = h.puzzle
+	pz.ring = pz.key.duplicate()
+	pz.ring[1] = posmod(pz.ring[1] - 1, 26)
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_WHEEL_UP
+	click.pressed = true
+	click.position = pz.DISC[1]
+	pz._gui_input(click)
+	check(pz.done, "Girar o anel da Lua até a chave resolve a cifra")
+	while h.mode != "explore" or h.puzzle != null:
+		await w(0.1)
+	check(State.flag("music_open"), "Cifra destranca a sala de música")
+	h.subs.clear()
+	h.go("foyer_door")
+	await w(2.0)
+	h.go("music")
+	await w(2.0)
+	check(h.view.id == "music", "Chega à sala de música")
+	h.open_puzzle("partitura")
+	await w(0.3)
+	h.puzzle.finish()
+	while h.stage == null:
+		await w(0.1)
+	check(h.stage.script_id == "partitura", "Partitura leva à cena de Celeste")
+	h.stage.skip()
+	while h.mode != "explore":
+		await w(0.1)
+	check(State.is_solved("partitura") and h.available_puzzles().has("atlas"), "Celeste libertada; o Atlas segue disponível")
+
+	# 7. Salvar e carregar.
 	State.qa = false
 	State.save_game()
 	var before := State.solved.duplicate()
+	var where := State.view
 	State.solved = {}
-	check(State.load_game() and State.solved == before and State.view == "dining", "Salvar e carregar preservam o progresso")
+	State.view = "foyer"
+	check(State.load_game() and State.solved == before and State.view == where, "Salvar e carregar preservam o progresso")
 	State.qa = true
 
 	print("RESULTADO: ", "tudo certo" if fails == 0 else "%d falha(s)" % fails)

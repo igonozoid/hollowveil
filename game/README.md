@@ -2,7 +2,15 @@
 
 Horror em primeira pessoa com enigmas e cenas fantasmas em vista lateral. Godot 4.7, só GDScript, sem nenhuma imagem ou som externo: os cômodos, os personagens, o sangue, a trilha e os efeitos são gerados por código. O design completo está em [../docs/design/GDD.md](../docs/design/GDD.md).
 
-Esta versão é a **fatia vertical do térreo**: saguão, sala de jantar, biblioteca e cozinha, com três enigmas (A Ceia, O Atlas e Olhos no Pote), três cenas de morte, a Prancheta de pistas, sanidade e salvamento automático.
+Esta versão traz o **térreo completo**:
+- **Cômodos:** saguão, porta de entrada, sala de jantar, biblioteca, cozinha, estufa e sala de música.
+- **Seis enigmas:** A Ceia, O Atlas, Olhos no Pote, As Veias, A Prancheta e A Partitura.
+- **Quatro cenas de morte:** Leocádia, Tobias, Benedita e Celeste.
+- **Sistemas:** pistas da Prancheta, sanidade e salvamento automático.
+
+Há dois caminhos que podem ser seguidos em paralelo:
+- Ceia → Atlas → Olhos no Pote → escada de serviço (o fim da demonstração).
+- Estufa → Prancheta → Partitura.
 
 ## Jogar
 
