@@ -84,7 +84,7 @@ func paint() -> void:
 			p.line3(Vector3(-2.3 + k * 0.25, 0.005, 3.1), Vector3(-2.3 + k * 0.25, 0.005, 3.9), Color(0.16, 0.1, 0.06), 1.0)
 	var trap := p.rect_of(tp)
 	if trap_open:
-		hot(trap, "walk", "event:trapdoor", "Descer aos porões")
+		hot(trap, "walk", "go:cellar", "Descer aos porões")
 	else:
 		hot(trap, "locked", "locked:trapdoor", "Alçapão")
 	if open:

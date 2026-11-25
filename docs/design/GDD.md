@@ -47,7 +47,7 @@ Não há atos, capítulos nem telas de carregamento. O jogo é uma só casa, que
 |---|---|---|---|---|
 | Térreo | Saguão, Sala de jantar, Biblioteca, Cozinha, Sala de música, Estufa | 6 | 4 | Desde o início |
 | 1º andar | Corredor, quartos de Celeste, Ofélia e dos hóspedes, Banheiro, Berçário vazio | 7 | 3 | 3 almas (a escada de serviço) |
-| Porões | Adega, Câmara fria, Capela, Cripta, Labirinto das fundações | 6 | 3 | 6 almas (o alçapão da cozinha) |
+| Porões | Galeria, Adega, Câmara fria, Capela, Cripta, Labirinto das fundações | 5 | 3 | 6 almas (o alçapão da cozinha) |
 | Sótão e torre | Sótão, Teatro Anatômico, Torre do relógio | 5 | 2 + finais | 7 almas (a escadaria principal destrava) |
 
 - **Voltar sempre vale a pena.** Andares já abertos continuam acessíveis e mudam com o progresso: sangue novo, objetos fora do lugar, sustos novos e relíquias que só aparecem depois.
@@ -98,7 +98,7 @@ O **Saguão** é o centro de tudo: a escadaria, o retrato de Morvant (cujos olho
 | **Estufa** | **As Veias** | "Apague as luzes" 5×5: tocar um bulbo inverte ele e os vizinhos | Estado inicial, sempre solucionável (solucionador em GF(2)) |
 | **Saguão** | **A Prancheta** | Cifra com dois deslocamentos alternados, decifrada girando os anéis do Sol e da Lua | Mensagem e as duas chaves |
 
-Porões e sótão (rascunho): pesos e órgãos em balança, labirinto em primeira pessoa nas fundações, ganchos de carne num quebra-cabeça de empurrar caixas na câmara fria e a montagem final do corpo no Teatro Anatômico.
+Sótão (rascunho): a montagem final do corpo no Teatro Anatômico.
 
 Ligações do térreo:
 - **Caminho 1:** a Ceia dá a chave de osso, que abre a biblioteca. O Atlas destranca a copa. Olhos no Pote libera a escada de serviço.
@@ -120,6 +120,23 @@ Chega-se pela escada de serviço da cozinha. O andar inteiro é um **corredor lo
 
 - **Ordem livre:** o quarto de Celeste e o banheiro estão abertos desde a chegada. O banheiro abre o quarto de hóspedes; a caixa de música abre o berçário; o berçário revela o que abre a porta de Ofélia.
 - **Pronto:** o andar inteiro. A porta de Ofélia só abre quando Dália diz o nome do filho morto, Benjamim, revelado na memória do berçário.
+
+## 6c. Os porões
+
+Chega-se pelo alçapão da cozinha, aberto por Ofélia. Uma **galeria de pedra em abóbada** leva à adega (esquerda), à câmara fria (direita) e, no fundo, ao portão de ferro da capela, atrás do qual o padre Anselmo reza ajoelhado. Paleta azul-negra e a luz quente de uma **lamparina que segue o cursor**; a trilha é um cantochão solitário sobre um bordão grave, com gotas pingando no escuro.
+
+| Cômodo | Enigma | Mecânica | Semente gera | Abre / revela |
+|---|---|---|---|---|
+| **Adega** | **A Balança** | Nove potes de órgãos, um mais pesado (o coração). Duas pesagens numa balança de pratos | Desempate de Morvant, que escolhe o pote pesado depois de cada pesagem, sempre o pior para o jogador | Cena de memória: o láudano no vinho do jantar. Dália leva o coração de Anselmo |
+| **Câmara fria** | **Os Ganchos** | Empurrar três corpos pendurados em trolleys até os ralos; só empurrar, nunca puxar | Sala e posição inicial. Uma busca de trás para a frente, a partir dos ralos, escolhe a posição que pede mais empurrões (até 24) | A chave da capela, presa no gelo |
+| **Capela** | **O Vitral** | Rosácea 6×6 em seis painéis de 2×3: cada cor uma vez por linha, coluna e painel | Vitral embaralhado e vidros retirados enquanto a solução continua única | Alma de Anselmo (cena de morte); a passagem para a cripta |
+| Cripta | — | (próxima leva) | — | — |
+| Labirinto das fundações | — | (próxima leva) | — | Sobe à escadaria principal, que leva ao sótão |
+
+- **Ordem livre:** a adega e a câmara fria abrem desde a chegada. A capela precisa da chave (Ganchos); a rosácea só acende quando o coração (Balança) volta ao relicário do altar.
+- **A Balança não aceita chute:** Morvant decide qual pote é o pesado só depois de cada pesagem, dentro do que a balança já mostrou. Só a estratégia dos três grupos de três garante o coração. A pista 2 dá uma terceira pesagem.
+- **Pronto:** galeria, adega, câmara fria e capela, com A Balança, Os Ganchos, O Vitral, a memória do vinho e a morte de Anselmo. A demonstração termina na passagem atrás do altar.
+- **Próxima leva:** a cripta (o caixãozinho de Benjamim, vazio) e o labirinto em primeira pessoa nas fundações, que sai na escadaria principal e abre o sótão.
 
 ## 7. Arte
 
@@ -145,6 +162,7 @@ Chega-se pela escada de serviço da cozinha. O andar inteiro é um **corredor lo
   - **Térreo:** cravo lento em menor harmônica, violoncelo e tique de relógio.
   - **Enigma:** pulsação esparsa, vidro e grave.
   - **Cena fantasma:** cluster dissonante de cordas e coração.
+  - **Porões:** cantochão de uma voz só sobre um bordão grave, com gotas d'água.
 - **Ambiente:** vento, rangidos aleatórios da casa, trovão distante sincronizado com o relâmpago nas janelas e relógio.
 - **Efeitos:** passos em madeira, porta rangendo, porta trancada, batida, esmagamento molhado, respingo, coração, sussurros com formantes, susto, serra de osso, tosse e grito.
 - **A risada de Morvant:** pulsos de formante "ha" que descem de tom.

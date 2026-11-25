@@ -21,6 +21,8 @@ const TRACKS := {
 		"voices": ["pad", "musicbox", "cello"], "tick": false, "seed": 37},
 	"fantasma": {"bpm": 50, "root": 38, "scale": LOCRIAN, "prog": [0, 1, 0, 4, 0, 1, 6, 4],
 		"voices": ["cluster", "heart", "choir"], "tick": false, "seed": 31},
+	"poroes": {"bpm": 44, "root": 36, "scale": PHRYG, "prog": [0, 1, 0, 5, 0, 1, 6, 0],
+		"voices": ["drone", "chant", "drips"], "tick": false, "seed": 43},
 }
 
 
@@ -96,6 +98,16 @@ static func render_track(spec: Dictionary) -> PackedFloat32Array:
 					if bar % 2 == 0:
 						var gn := degree(spec, d + rng.randi_range(0, 6), 2)
 						_tone(buf, t0 + rng.randi_range(0, 3) * beat, beat * 3.0, hz(gn), 0.05, "bell")
+				"chant":
+					# Cantochão: uma linha só, em graus vizinhos, como um padre que reza sozinho.
+					var deg := d + 2
+					for i in 4:
+						deg = clampi(deg + rng.randi_range(-1, 1), d, d + 5)
+						if rng.randf() < 0.8:
+							_tone(buf, t0 + i * beat + 0.04, beat * 1.05, hz(degree(spec, deg, 1)), 0.05, "choir")
+				"drips":
+					for i in rng.randi_range(0, 2):
+						_drop(buf, t0 + rng.randf() * 4.0 * beat, 0.09, rng.randf_range(900.0, 1700.0))
 				"pulse":
 					for i in 4:
 						_tone(buf, t0 + i * beat, beat * 0.3, hz(chord[0] - 24), 0.12, "pluckbass")
@@ -174,6 +186,17 @@ static func _thump(buf: PackedFloat32Array, t0: float, amp: float) -> void:
 		var t := float(i) / RATE
 		var f := 55.0 * exp(-t * 6.0) + 32.0
 		buf[idx] += sin(TAU * f * t) * exp(-t * 14.0) * amp
+
+
+## Gota d'água numa poça: um "plim" que sobe de tom.
+static func _drop(buf: PackedFloat32Array, t0: float, amp: float, f0: float) -> void:
+	var start := int(t0 * RATE)
+	var ph := 0.0
+	for i in int(0.12 * RATE):
+		var idx := (start + i) % buf.size()
+		var t := float(i) / RATE
+		ph += TAU * f0 * (1.0 + t * 9.0) / RATE
+		buf[idx] += sin(ph) * exp(-t * 45.0) * amp
 
 
 static func _click(buf: PackedFloat32Array, t0: float, amp: float) -> void:
@@ -344,6 +367,15 @@ static func make(name: String) -> PackedFloat32Array:
 			return b
 		"wind":
 			return _fx_wind()
+		"drip":
+			var b2 := _buf(0.5)
+			_drop(b2, 0.0, 0.7, 1300.0)
+			_reverb(b2, 0.6, 0.6)
+			return b2
+		"bell":
+			return _fx_bell()
+		"ice":
+			return _fx_ice()
 	return _buf(0.05)
 
 
@@ -630,4 +662,31 @@ static func _fx_wind() -> PackedFloat32Array:
 		var k := float(i) / x
 		b[i] = b[i] * k + b[b.size() - x + i] * (1.0 - k)
 	b.resize(b.size() - x)
+	return b
+
+
+## Sino de capela, grave e rachado.
+static func _fx_bell() -> PackedFloat32Array:
+	var b := _buf(3.0)
+	for i in b.size():
+		var t := float(i) / RATE
+		var f := 196.0
+		var s := sin(TAU * f * t) + 0.6 * sin(TAU * f * 2.41 * t) * exp(-t * 1.5) + 0.4 * sin(TAU * f * 3.02 * t + sin(t * 9.0)) * exp(-t * 2.5) + 0.3 * sin(TAU * f * 0.5 * t)
+		b[i] = s * exp(-t * 1.3) * minf(t / 0.004, 1.0) * 0.4
+	return b
+
+
+## Gelo rachando: estalos secos em rajada.
+static func _fx_ice() -> PackedFloat32Array:
+	var b := _buf(0.7)
+	var nz := Hiss.new(21)
+	var next := 0.0
+	var amp := 0.0
+	for i in b.size():
+		var t := float(i) / RATE
+		if t >= next:
+			amp = nz.rng.randf_range(0.4, 1.0) * exp(-t * 3.0)
+			next = t + nz.rng.randf_range(0.01, 0.09)
+		amp *= 0.993
+		b[i] = nz.band(0.2, 0.9) * amp * 0.8
 	return b

@@ -1,5 +1,5 @@
 extends Node2D
-## Fim da fatia vertical: resumo da investigação e o que vem depois da escada.
+## Fim da demonstração: resumo da investigação e o que vem depois da cripta.
 
 signal done
 
@@ -22,10 +22,10 @@ func _ready() -> void:
 			host += 1
 	var mins := int(State.play_time / 60.0)
 	var souls := 0
-	for id in ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros"]:
+	for id in ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral"]:
 		if State.is_solved(id):
 			souls += 1
-	label.text = "O ALÇAPÃO\n\n" + ("%d de 6 almas libertadas até aqui. " % souls) + ("Ninguém ficou para trás." if souls == 6 else "Alguém ainda espera nos cômodos que você deixou.") + "\n\nTempo: %d min   ·   Sanidade: %d%%   ·   Pistas: %d   ·   Resolvidos por Morvant: %d\n\n\nOS PORÕES AINDA ESTÃO SENDO CONSTRUÍDOS\nfim da demonstração\n\n\nclique para voltar ao menu" % [mins, int(State.sanity), hints, host]
+	label.text = "A CRIPTA\n\n" + ("%d de 7 almas libertadas até aqui. " % souls) + ("Ninguém ficou para trás." if souls == 7 else "Alguém ainda espera nos cômodos que você deixou.") + "\n\nTempo: %d min   ·   Sanidade: %d%%   ·   Pistas: %d   ·   Resolvidos por Morvant: %d\n\n\nA CRIPTA E O LABIRINTO AINDA ESTÃO SENDO CONSTRUÍDOS\nfim da demonstração\n\n\nclique para voltar ao menu" % [mins, int(State.sanity), hints, host]
 	add_child(label)
 	Audio.music("menu")
 

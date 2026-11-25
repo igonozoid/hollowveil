@@ -200,7 +200,7 @@ func _process(delta: float) -> void:
 
 
 func gib(from: Vector2, kind: String, vel: Vector2) -> void:
-	if not State.gore and kind != "tooth":
+	if not State.gore and kind != "tooth" and kind != "glass":
 		return
 	gibs.append({"pos": from, "vel": vel, "kind": kind, "rot": 0.0, "rest": false})
 
@@ -227,6 +227,8 @@ func _draw() -> void:
 				draw_rect(Rect2(p - Vector2(7, 3), Vector2(14, 6)), Color(0.8, 0.66, 0.58))
 				draw_line(p + Vector2(-5, 0), p + Vector2(5, -1), Color(0.12, 0.16, 0.3), 1.0)
 				draw_rect(Rect2(p + Vector2(-7, 2), Vector2(14, 1)), Color(0.55, 0.0, 0.03))
+			"glass":
+				draw_line(p, p + Vector2(3, -2).rotated(g["rot"]), Color(0.3, 0.55, 0.3, 0.8), 1.0)
 			"eye":
 				draw_circle(p, 2.0, Color(0.92, 0.9, 0.85))
 				draw_rect(Rect2(p + Vector2(0, -1), Vector2(1, 1)), Color(0.15, 0.25, 0.4))
@@ -336,6 +338,16 @@ func _draw_actor(a: Actor) -> void:
 		"colher":
 			draw_line(hand, hand + dir * 7.0, Color(0.7, 0.7, 0.72), 1.0)
 			draw_circle(hand + dir * 8.0, 1.5, Color(0.7, 0.7, 0.72))
+		"garrafa":
+			draw_line(hand, hand + dir * 5.0, Color(0.12, 0.25, 0.12), 2.0)
+			draw_line(hand + dir * 5.0, hand + dir * 14.0, Color(0.1, 0.22, 0.1), 4.0)
+		"coracao":
+			# O coração ainda bate na mão dele.
+			var beat := maxf(0.0, sin(t * 7.0)) ** 6.0
+			draw_circle(hand + dir * 3.0, 3.5 + beat * 1.2, Color(0.6, 0.02, 0.06))
+			draw_circle(hand + dir * 3.0 + Vector2(-1, -1), 1.2, Color(0.9, 0.35, 0.35))
+			if State.gore and beat > 0.5:
+				draw_rect(Rect2(hand + dir * 3.0 + Vector2(0, 4), Vector2(1, 3)), Color(0.6, 0.0, 0.04))
 
 
 ## Quadrilátero desenhado como primitiva (não falha quando degenera).
@@ -545,6 +557,73 @@ func _props_sussurros() -> void:
 		draw_rect(Rect2(dx - 2, 153, 1, 1), Color(0.05, 0.05, 0.1))
 		draw_rect(Rect2(dx + 1, 153, 1, 1), Color(0.05, 0.05, 0.1))
 	_candles(400, 276)
+
+
+func _stone_wall() -> void:
+	# Pedra dos porões, em fiadas desencontradas, sem lambri.
+	for i in 20:
+		draw_rect(Rect2(0, i * 14, 640, 15), Color(0.12, 0.13, 0.17).lerp(Color(0.06, 0.065, 0.09), i / 19.0))
+	for row in 12:
+		var y := row * 22.0
+		draw_line(Vector2(0, y), Vector2(640, y), Color(0.05, 0.05, 0.07), 1.0)
+		var off := 0.0 if row % 2 == 0 else 26.0
+		for x in range(0, 680, 52):
+			draw_line(Vector2(x + off, y), Vector2(x + off, y + 22), Color(0.05, 0.05, 0.07), 1.0)
+	draw_rect(Rect2(0, FLOOR, 640, 100), Color(0.05, 0.05, 0.06))
+	for i in 6:
+		draw_line(Vector2(0, FLOOR + i * i * 3), Vector2(640, FLOOR + i * i * 3), Color(0.08, 0.08, 0.1), 1.0)
+
+
+func _props_balanca() -> void:
+	_stone_wall()
+	# Barris deitados à direita, em duas fileiras.
+	for row in 2:
+		for k in 3:
+			var c := Vector2(470 + k * 58 + row * 29, 250 - row * 52)
+			draw_circle(c, 26, Color(0.3, 0.17, 0.1))
+			draw_arc(c, 21, 0, TAU, 20, Color(0.16, 0.09, 0.05), 2.0)
+			draw_line(c + Vector2(-12, -18), c + Vector2(-12, 18), Color(0.2, 0.11, 0.06), 1.0)
+			draw_line(c + Vector2(12, -18), c + Vector2(12, 18), Color(0.2, 0.11, 0.06), 1.0)
+	# Mesa com garrafas abertas e frascos de láudano.
+	draw_rect(Rect2(250, 232, 130, 6), Color(0.3, 0.18, 0.1))
+	for x in [258, 370]:
+		draw_rect(Rect2(x, 238, 4, 38), Color(0.24, 0.14, 0.08))
+	for i in 7:
+		draw_rect(Rect2(262 + i * 15, 206, 6, 26), Color(0.08, 0.16, 0.08))
+		draw_rect(Rect2(264 + i * 15, 198, 2, 8), Color(0.08, 0.16, 0.08))
+	for i in 3:
+		draw_rect(Rect2(366 + i * 5, 222, 3, 10), Color(0.5, 0.36, 0.2, 0.8))
+	_candles(272, 232)
+	# Escada de pedra descendo à esquerda.
+	for i in 6:
+		draw_rect(Rect2(20 + i * 14, 276 - (6 - i) * 12, 60, 12), Color(0.14, 0.14, 0.17))
+
+
+func _props_vitral() -> void:
+	_stone_wall()
+	# Rosácea no alto: acesa, colorida.
+	var rc := Vector2(440, 92)
+	var cols := [Color(0.78, 0.1, 0.14), Color(0.18, 0.32, 0.86), Color(0.95, 0.7, 0.18), Color(0.2, 0.62, 0.32), Color(0.56, 0.24, 0.72), Color(0.92, 0.9, 0.82)]
+	draw_circle(rc, 50, Color(0.1, 0.1, 0.12))
+	for i in 12:
+		var a0 := TAU * i / 12.0
+		var a1 := TAU * (i + 1) / 12.0
+		var c: Color = cols[i % 6]
+		draw_colored_polygon(PackedVector2Array([rc, rc + Vector2(cos(a0), sin(a0)) * 44.0, rc + Vector2(cos(a1), sin(a1)) * 44.0]), Color(c, 0.55 + 0.1 * sin(t * 2.0 + i)))
+		draw_line(rc, rc + Vector2(cos(a0), sin(a0)) * 44.0, Color(0.05, 0.04, 0.04), 1.0)
+	# Crucifixo e altar de pedra com toalha.
+	draw_rect(Rect2(438, 150, 4, 50), Color(0.18, 0.16, 0.14))
+	draw_rect(Rect2(424, 164, 32, 4), Color(0.18, 0.16, 0.14))
+	draw_rect(Rect2(380, 236, 130, 40), Color(0.32, 0.31, 0.3))
+	draw_rect(Rect2(376, 230, 138, 7), Color(0.78, 0.76, 0.72))
+	_candles(392, 230)
+	_candles(498, 230)
+	# Bancos à esquerda.
+	for i in 3:
+		var x := 60.0 + i * 70.0
+		draw_rect(Rect2(x, 250, 46, 5), Color(0.24, 0.14, 0.08))
+		draw_rect(Rect2(x + 40, 226, 5, 50), Color(0.24, 0.14, 0.08))
+		draw_rect(Rect2(x + 2, 255, 4, 21), Color(0.2, 0.12, 0.07))
 
 
 # ---------------------------------------------------------------- roteiros
@@ -981,6 +1060,170 @@ func scene_sussurros() -> void:
 	else:
 		_say("OFÉLIA", "Ele vai fazer o mesmo com você, Dália. O padre ainda reza lá embaixo, na capela. Desça pelo alçapão da cozinha.")
 	await _w(5.0)
+	_tw(soul, "alpha", 0.0, 1.0)
+	await _w(1.2)
+	_end()
+
+
+## Memória, não morte: o láudano no vinho do jantar, e o padre que viu.
+func scene_balanca() -> void:
+	prop_draw = _props_balanca
+	surfaces = [Rect2(250, 232, 130, 6)]
+	blood.walls = [Rect2(40, 60, 560, 200)]
+	var host := _actor("host", {"x": 330.0, "facing": 1.0, "kind": "host", "arm_f": 1.1})
+	var ans := _actor("ans", {"x": -30.0, "facing": 1.0, "kind": "priest", "alpha": 0.8})
+	await _w(0.8)
+	# Morvant pinga o láudano garrafa por garrafa.
+	for i in 4:
+		_tw(host, "arm_f", 1.5, 0.3)
+		await _w(0.4)
+		_sfx("drip", -6.0, 1.0 + i * 0.1)
+		_sfx("tile", -14.0, 1.8)
+		_tw(host, "arm_f", 1.0, 0.3)
+		await _w(0.5)
+	_walk_to(ans, 170.0, 2.6)
+	_say("ANSELMO", "Ezequiel? Celeste disse que você estava aqui embaixo. O que está pondo no vinho?")
+	await _w(3.2)
+	host.facing = -1.0
+	_say("MORVANT", "Láudano, padre. Uma gota por convidado. Para que ninguém se levante da mesa cedo demais.")
+	await _w(4.0)
+	_say("ANSELMO", "Isso é veneno. Há uma moça de dezenove anos lá em cima. A sua filha.")
+	await _w(3.6)
+	_say("MORVANT", "Ofélia bebe água. Ela precisa estar acordada. Ela vai ouvir tudo.")
+	await _w(3.6)
+	_tw(ans, "arm_f", 0.8, 0.3)
+	_say("ANSELMO", "Vou subir e contar a eles. Agora mesmo, antes do primeiro brinde...")
+	await _w(2.6)
+	ans.facing = -1.0
+	_walk_to(ans, 120.0, 1.4)
+	host.tool = "garrafa"
+	_walk_to(host, 150.0, 1.1)
+	await _w(1.1)
+	host.facing = -1.0
+	_tw(host, "arm_f", 2.6, 0.12)
+	await _w(0.14)
+	_sfx("crunch", 0.0, 1.3)
+	_sfx("pop", -4.0, 0.7)
+	_shake(0.9)
+	flash = 0.3
+	var head := part("ans", "head")
+	for k in 6:
+		gib(head, "glass", Vector2(randf_range(-90, 40), randf_range(-140, -40)))
+	blood.spray(head, Vector2(-1, -0.5), 40, 160.0, 0.7, 1.8)
+	host.tool = ""
+	ans.walking = false
+	ans.tremble = 1.0
+	_tw(ans, "sit", 1.0, 0.4)
+	_tw(ans, "y", FLOOR + 10.0, 0.4)
+	_tw(ans, "lean", 0.6, 0.4)
+	await _w(0.6)
+	for i in 5:
+		blood.drip(part("ans", "head") + Vector2(randf_range(-2, 2), 2), 30.0)
+	_tw(host, "arm_f", 0.4, 0.3)
+	await _w(0.8)
+	ans.tremble = 0.0
+	_say("MORVANT", "O senhor vai rezar, padre. Lá na capela, de joelhos, até eu precisar do seu coração.")
+	await _w(4.0)
+	_sfx("laugh", -8.0, 0.85)
+	_say("ANSELMO", "...Pater noster, qui es in caelis...")
+	await _w(3.4)
+	_tw(ans, "alpha", 0.0, 2.0)
+	_tw(host, "alpha", 0.0, 2.0)
+	await _w(2.2)
+	_say("DÁLIA", "O vinho do jantar. Por isso ninguém conseguiu fugir. E o padre sabia, e ficou trancado aqui embaixo.")
+	await _w(4.4)
+	_end()
+
+
+func scene_vitral() -> void:
+	prop_draw = _props_vitral
+	surfaces = [Rect2(376, 230, 138, 7)]
+	blood.walls = [Rect2(40, 40, 560, 230)]
+	var ans := _actor("ans", {"x": 360.0, "y": FLOOR + 10.0, "facing": 1.0, "kind": "priest", "sit": 1.0, "lean": 0.25, "arm_f": 1.6, "arm_b": 1.5, "bend": 1.2, "alpha": 0.85})
+	var host := _actor("host", {"x": -40.0, "facing": 1.0, "kind": "host"})
+	await _w(1.0)
+	_sfx("bell", -8.0, 1.0)
+	_say("ANSELMO", "...requiem aeternam dona eis, Domine... Eu sabia que você viria, Ezequiel.")
+	await _w(3.8)
+	_walk_to(host, 300.0, 3.2)
+	await _w(1.2)
+	_say("ANSELMO", "Treze anos rezando por você. Alguém precisava confessar no seu lugar.")
+	await _w(2.4)
+	_say("MORVANT", "Guarde a absolvição, padre. Eu vim buscar o coração que a sente.")
+	await _w(3.8)
+	# Ele ergue o padre e o deita sobre o altar.
+	_tw(host, "arm_f", 1.5, 0.3)
+	_tw(ans, "sit", 0.0, 0.5)
+	_tw(ans, "y", FLOOR, 0.5)
+	_tw(ans, "lean", 0.0, 0.5)
+	await _w(0.7)
+	_sfx("slam", -6.0, 1.1)
+	_tw(ans, "x", 488.0, 0.5)
+	_tw(ans, "y", 230.0, 0.5)
+	_tw(ans, "fall", -1.0, 0.5)
+	ans.arm_f = 0.0
+	ans.arm_b = 0.0
+	await _w(0.6)
+	_walk_to(host, 418.0, 0.8)
+	await _w(0.9)
+	host.facing = 1.0
+	host.tool = "bisturi"
+	_say("ANSELMO", "...Pater... noster...")
+	ans.tremble = 1.0
+	# Bisturi: o peito aberto de cima a baixo.
+	for i in 4:
+		_tw(host, "arm_f", 1.9 - (i % 2) * 0.5, 0.16)
+		_sfx("squelch", -2.0, randf_range(0.8, 1.0))
+		var chest := part("ans", "shoulder").lerp(part("ans", "hip"), 0.3 + i * 0.1)
+		blood.spray(chest, Vector2(randf_range(-0.4, 0.4), -1), 20, 140.0, 0.6, 1.6)
+		_shake(0.3)
+		await _w(0.32)
+	_sfx("scream", -4.0, 0.9)
+	# Serra: as costelas.
+	host.tool = "serra"
+	_sfx("saw", 0.0, 0.9)
+	for i in 6:
+		_tw(host, "arm_f", 1.4 + (i % 2) * 0.5, 0.12)
+		blood.spray(part("ans", "shoulder").lerp(part("ans", "hip"), 0.35), Vector2(randf_range(-1, 1), -1), 12, 160.0, 0.7)
+		if i % 2 == 1:
+			_sfx("crunch", -2.0, 1.0 + i * 0.05)
+		_shake(0.35)
+		await _w(0.2)
+	# A mão entra e sai com o coração.
+	host.tool = ""
+	_tw(host, "arm_f", 2.0, 0.3)
+	await _w(0.5)
+	_sfx("squelch", 0.0, 0.6)
+	_sfx("heart", 0.0, 1.0)
+	_tw(host, "arm_f", 2.9, 0.25)
+	host.tool = "coracao"
+	var c2 := part("ans", "shoulder").lerp(part("ans", "hip"), 0.35)
+	blood.spray(c2, Vector2(0, -1), 70, 220.0, 0.5, 2.2)
+	blood.pool(Vector2(450, FLOOR), 30.0)
+	_shake(1.0)
+	flash = 0.4
+	ans.tremble = 0.0
+	for i in 6:
+		blood.drip(Vector2(randf_range(380, 510), 237.0), 40.0)
+	await _w(1.2)
+	for i in 3:
+		_sfx("heart", -4.0, 0.9)
+		await _w(0.8)
+	_say("MORVANT", "Ainda bate. Coração de padre bate por mais tempo. É a culpa: ela dá corda.")
+	await _w(4.0)
+	var soul := _actor("soul", {"x": 460.0, "y": 230.0, "facing": -1.0, "kind": "priest", "alpha": 0.0})
+	_tw(soul, "alpha", 0.75, 1.5)
+	_tw(soul, "rise", 40.0, 2.5)
+	_sfx("whisper", -4.0, 0.7)
+	_sfx("bell", -10.0, 1.3)
+	await _w(2.0)
+	if host_version:
+		_say("MORVANT", "O padre manda dizer que perdoa você, médium. Eu perguntei por ele.")
+	else:
+		_say("ANSELMO", "Ele costurou um corpo com as nossas partes. Benjamim não voltou nele, filha. Outra coisa voltou.")
+		await _w(4.6)
+		_say("ANSELMO", "Atrás do altar há uma passagem para a cripta. Não deixe que ele termine.")
+	await _w(4.6)
 	_tw(soul, "alpha", 0.0, 1.0)
 	await _w(1.2)
 	_end()

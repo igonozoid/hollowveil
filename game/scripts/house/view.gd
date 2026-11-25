@@ -15,6 +15,9 @@ var title := ""
 var music := "terreo"
 ## Gradação de cor do pós-processamento (post_fx.GRADES).
 var grade := "terreo"
+## Porões: Dália carrega uma lamparina que segue o cursor.
+var lantern := false
+var _lamp: PointLight2D = null
 var p: Persp
 var hotspots: Array = []
 var glass: Array = []
@@ -32,6 +35,8 @@ func _ready() -> void:
 	overlay.draw.connect(_draw_overlay)
 	Audio.lightning.connect(_on_lightning)
 	State.flag_changed.connect(func(_n): queue_redraw())
+	if lantern:
+		_lamp = Light.make(self, get_viewport().get_mouse_position(), Color(1.0, 0.76, 0.46), 120.0, 0.85, 0.1)
 
 
 func _on_lightning(s: float) -> void:
@@ -58,6 +63,11 @@ func _spawn_lights(spots: Array) -> void:
 func _process(delta: float) -> void:
 	t += delta
 	flash = maxf(0.0, flash - delta * 2.2)
+	if _lamp:
+		_lamp.position = _lamp.position.lerp(get_viewport().get_mouse_position() + Vector2(0, 10), minf(1.0, delta * 7.0))
+		# Gotas que caem em algum lugar no escuro.
+		if randf() < delta * 0.3:
+			Audio.play("drip", -16.0, randf_range(0.8, 1.35))
 	overlay.queue_redraw()
 
 

@@ -18,6 +18,10 @@ const VIEWS := {
 	"guest_room": preload("res://scripts/house/views/guest_room.gd"),
 	"nursery": preload("res://scripts/house/views/nursery.gd"),
 	"ofelia_room": preload("res://scripts/house/views/ofelia_room.gd"),
+	"cellar": preload("res://scripts/house/views/cellar.gd"),
+	"wine_cellar": preload("res://scripts/house/views/wine_cellar.gd"),
+	"cold_room": preload("res://scripts/house/views/cold_room.gd"),
+	"chapel": preload("res://scripts/house/views/chapel.gd"),
 }
 const PUZZLES := {
 	"ceia": preload("res://scripts/puzzles/ceia.gd"),
@@ -31,11 +35,14 @@ const PUZZLES := {
 	"pele": preload("res://scripts/puzzles/pele.gd"),
 	"movel": preload("res://scripts/puzzles/movel.gd"),
 	"sussurros": preload("res://scripts/puzzles/sussurros.gd"),
+	"balanca": preload("res://scripts/puzzles/balanca.gd"),
+	"ganchos": preload("res://scripts/puzzles/ganchos.gd"),
+	"vitral": preload("res://scripts/puzzles/vitral.gd"),
 }
 ## Enigmas que libertam uma alma (e têm cena de morte). Os outros só abrem caminho.
-const SOULS := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros"]
+const SOULS := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral"]
 ## Enigmas que levam a uma cena (almas e memórias).
-const SCENES := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "movel"]
+const SCENES := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral", "movel", "balanca"]
 const GhostStage := preload("res://scripts/ghosts/ghost_stage.gd")
 const Subtitles := preload("res://scripts/ui/subtitles.gd")
 const Hud := preload("res://scripts/ui/hud.gd")
@@ -64,6 +71,16 @@ const LOOK := {
 	"rocker": "A cadeira balança. Quando eu olho, ela para. Quando desvio o olhar, recomeça.",
 	"circle_after": "As velas apagaram sozinhas. O giz está borrado, como se alguém tivesse se arrastado para fora do círculo.",
 	"ofelia_desk": "Cadernos de escola cheios de nomes. Todos de pessoas mortas na casa. O meu está na última página.",
+	"ossuary": "Crânios empilhados em nichos, todos virados para a capela. Um deles ainda tem os dentes de ouro arrancados.",
+	"barrels": "Os barris têm datas a giz: 1909, 1910, 1911. O de 1911 está pela metade, e não cheira a vinho.",
+	"scale_after": "A balança ficou parada no equilíbrio. Os oito potes que sobraram me olham pelo vidro.",
+	"steel_table": "Uma mesa de inox, serras de osso e um avental pendurado. Ainda úmido.",
+	"cold_after": "Os ganchos estão sobre os ralos. O gelo começou a derreter, e a água que corre é rosada.",
+	"rose_dark": "Uma rosácea de vidro, apagada. Não há céu do outro lado: só velas, e alguém precisa acendê-las.",
+	"reliquary_empty": "Um relicário de vidro no altar, vazio, do tamanho de um punho fechado.",
+	"reliquary_full": "O coração bate dentro do relicário. Cada batida acende a rosácea um pouco mais.",
+	"rose_after": "A rosácea brilha sozinha. A cruz, o peixe, a chave, o cálice, a estrela e o olho, cada um no seu lugar.",
+	"altar_after": "A toalha do altar está encharcada. Atrás dele, a parede parece mais fina.",
 }
 const LOCKED := {
 	"stairs": "Um peso no peito me empurra de volta. Ainda não.",
@@ -74,6 +91,7 @@ const LOCKED := {
 	"guest": "Trancada. A fechadura é de latão, com um 3 gravado.",
 	"nursery": "Trancado. Do outro lado, um móbile gira sem vento.",
 	"trapdoor": "Um alçapão no chão, pregado por dentro. Lá embaixo, alguém reza em latim.",
+	"chapel_gate": "Um portão de ferro com cadeado em forma de cruz. Do outro lado, o padre continua rezando.",
 }
 
 var view_root := Node2D.new()
@@ -354,6 +372,18 @@ func _reward(id: String, by_host: bool) -> void:
 			State.set_flag("porao_open")
 			hud.notify("O ALÇAPÃO DA COZINHA\nOfélia abriu o caminho para os porões.")
 			subs.say("MORVANT", "Desça, médium. O padre Anselmo adora uma confissão.")
+		"balanca":
+			State.give("coracao")
+			hud.notify("O CORAÇÃO DE ANSELMO\nAinda bate dentro do pote. O relicário da capela tem o tamanho dele.")
+			subs.say("MORVANT", "Guardei no vinho para não secar. Leve para ele, médium. O padre sente falta.")
+		"ganchos":
+			State.give("chave_capela")
+			hud.notify("CHAVE DA CAPELA\nPresa no gelo, debaixo do último ralo. Tem uma cruz no lugar do dente.")
+			subs.say("MORVANT", "Anselmo escondia a chave de mim. Como se eu precisasse de chave para entrar numa igreja.")
+		"vitral":
+			State.set_flag("cripta_open")
+			hud.notify("A CRIPTA\nAtrás do altar, uma laje de pedra se moveu sozinha.")
+			subs.say("MORVANT", "Sete almas, médium. Só falta a sua. E o meu filho espera lá embaixo, na cripta.")
 		"pele":
 			hud.notify("A PELE DE HÉLIO\nUma âncora, uma rosa e a palavra \"Mãe\".")
 			subs.say("MORVANT", "Pele boa, bem curtida pelo sol. Serviu de capa para o meu diário.")
@@ -392,14 +422,15 @@ func _event(id: String) -> void:
 		"ofelia_door":
 			Audio.play("whisper", -4.0, 1.2)
 			subs.say("OFÉLIA", ["Você ouve a gente. Eu sei que ouve. Mas só abro se disser o nome dele.", "O nome. O nome do menino do berço. Diga, e eu abro."][int(State.play_time) % 2])
-		"trapdoor":
+		"crypt":
 			busy = true
-			Audio.play("door", -4.0, 0.6)
-			subs.say("DÁLIA", "O alçapão abre sozinho. Uma escada de pedra desce para o frio. Lá embaixo, um padre reza.")
+			Audio.play("slam", -6.0, 0.5)
+			Audio.play("bell", -10.0, 0.7)
+			subs.say("DÁLIA", "Atrás do altar, a laje deixa uma fresta. Uma escada desce ainda mais fundo. Lá embaixo, um bebê chora.")
 			await subs.finished
-			var tw3 := create_tween()
-			tw3.tween_property(fade, "modulate:a", 1.0, 1.5)
-			await tw3.finished
+			var tw4 := create_tween()
+			tw4.tween_property(fade, "modulate:a", 1.0, 1.5)
+			await tw4.finished
 			slice_finished.emit()
 		"gramophone":
 			Audio.play("sting", -14.0, 1.6)
@@ -431,8 +462,11 @@ func available_puzzles() -> Array:
 		"pele": State.has("chave_hospedes"),
 		"movel": State.is_solved("caixa"),
 		"sussurros": State.flag("nome_benjamim"),
+		"balanca": State.flag("porao_open"),
+		"ganchos": State.flag("porao_open"),
+		"vitral": State.flag("heart_placed") and State.has("chave_capela"),
 	}
-	for id in ["ceia", "veias", "atlas", "prancheta", "olhos", "partitura", "banho", "caixa", "pele", "movel", "sussurros"]:
+	for id in ["ceia", "veias", "atlas", "prancheta", "olhos", "partitura", "banho", "caixa", "pele", "movel", "sussurros", "balanca", "ganchos", "vitral"]:
 		if gates[id] and not State.is_solved(id):
 			out.append(id)
 	return out

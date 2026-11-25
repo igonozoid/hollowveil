@@ -177,6 +177,73 @@ func _run() -> void:
 	check(movel_ok, "O Móbile: exatamente um jeito de equilibrar, em 60 sementes")
 	check(sus_ok, "Os Sussurros: um único esconderijo consistente, em 60 sementes")
 	check(solvable, "Olhos no Pote tem saída em 60 sementes")
+	# Porões: Balança (estratégia certa sempre acha; chute não), Vitral único, Ganchos solucionável.
+	var Balanca = load("res://scripts/puzzles/balanca.gd")
+	var Vitral = load("res://scripts/puzzles/vitral.gd")
+	var Ganchos = load("res://scripts/puzzles/ganchos.gd")
+	var bal_ok := true
+	var bal_guess_fails := true
+	var vit_ok := true
+	var min_glass := 99
+	for s in 60:
+		State.seed_value = s * 4211 + 5
+		State.drafts = {}
+		var b = Balanca.new()
+		b.build()
+		for j in 3:
+			b.where[j] = 1
+			b.where[3 + j] = 2
+		b.weigh()
+		var g: Array = b.cand.duplicate()
+		for j in 9:
+			b.where[j] = 0
+		b.where[g[0]] = 1
+		b.where[g[1]] = 2
+		b.weigh()
+		bal_ok = bal_ok and b.cand.size() == 1
+		b.free()
+		var b2 = Balanca.new()
+		b2.build()
+		b2.where[0] = 1
+		b2.where[1] = 2
+		b2.weigh()
+		b2.weigh()
+		bal_guess_fails = bal_guess_fails and b2.cand.size() > 1
+		b2.free()
+		var v = Vitral.new()
+		var rng3 := RandomNumberGenerator.new()
+		rng3.seed = State.puzzle_seed("vitral")
+		v.generate(rng3)
+		var clues := 0
+		for i in 36:
+			if v.grid[i] >= 0:
+				clues += 1
+				vit_ok = vit_ok and v.grid[i] == v.solution[i]
+		min_glass = mini(min_glass, clues)
+		vit_ok = vit_ok and Vitral.count_solutions(v.grid, 2) == 1
+		var full: Array = v.solution.duplicate()
+		v.grid = full
+		vit_ok = vit_ok and v.conflicts().is_empty()
+		v.free()
+	check(bal_ok, "A Balança: três contra três e depois um contra um sempre acham o coração")
+	check(bal_guess_fails, "A Balança: pesar um contra um não basta (Morvant esconde o coração)")
+	check(vit_ok and min_glass >= 12, "O Vitral: solução única em 60 sementes (mínimo de %d vidros)" % min_glass)
+	var gan_ok := true
+	var gan_min := 99
+	for s in 16:
+		State.seed_value = s * 9173 + 3
+		State.drafts = {}
+		var gz = Ganchos.new()
+		var rng4 := RandomNumberGenerator.new()
+		rng4.seed = State.puzzle_seed("ganchos")
+		gz.generate(rng4)
+		gz._find_dead()
+		gz.boxes = gz.start_boxes.duplicate()
+		var n: int = gz.solve_pushes()
+		gan_ok = gan_ok and n == gz.depth and n >= 14 and not gz.solved_now()
+		gan_min = mini(gan_min, n)
+		gz.free()
+	check(gan_ok, "Os Ganchos: a busca para trás acerta o mínimo de empurrões, em 16 sementes (mínimo %d)" % gan_min)
 
 	# 2. Prancheta: pista 1, pista 2, e na terceira Morvant resolve.
 	main._new_game()
@@ -362,11 +429,98 @@ func _run() -> void:
 	await w(2.2)
 	var trap := false
 	for hs in h.view.hotspots:
-		if hs["action"] == "event:trapdoor":
+		if hs["action"] == "go:cellar":
 			trap = true
 	check(trap, "O alçapão da cozinha leva aos porões")
 
-	# 9. Salvar e carregar.
+	# 9. Porões: ganchos → chave; balança → memória → coração; capela → vitral → Anselmo.
+	h.subs.clear()
+	h.go("cellar")
+	await w(2.2)
+	check(h.view.id == "cellar" and h.view.grade == "poroes" and h.view._lamp != null, "Chega à galeria dos porões, com a lamparina")
+	var gate_locked := false
+	for hs in h.view.hotspots:
+		if hs["action"] == "locked:chapel_gate":
+			gate_locked = true
+	check(gate_locked, "O portão da capela começa trancado")
+	check(h.available_puzzles().has("balanca") and h.available_puzzles().has("ganchos") and not h.available_puzzles().has("vitral"), "Balança e Ganchos abertos; Vitral ainda não")
+	h.subs.clear()
+	h.go("cold_room")
+	await w(2.2)
+	h.subs.clear()
+	h.open_puzzle("ganchos")
+	await w(0.3)
+	var gz2 = h.puzzle
+	gz2.boxes = gz2.targets.duplicate()
+	gz2.history.append([gz2.player, gz2.boxes.duplicate()])
+	gz2.finish()
+	while h.puzzle != null or h.mode != "explore":
+		await w(0.1)
+	check(State.has("chave_capela"), "Os Ganchos dão a chave da capela")
+	h.subs.clear()
+	h.go("cellar")
+	await w(2.2)
+	h.go("wine_cellar")
+	await w(2.2)
+	h.subs.clear()
+	h.open_puzzle("balanca")
+	await w(0.3)
+	var bz = h.puzzle
+	for j in 3:
+		bz.where[j] = 1
+		bz.where[3 + j] = 2
+	bz.weigh()
+	var g2: Array = bz.cand.duplicate()
+	for j in 9:
+		bz.where[j] = 0
+	bz.where[g2[0]] = 1
+	bz.where[g2[1]] = 2
+	bz.weigh()
+	bz.open_jar(bz.cand[0])
+	while h.stage == null:
+		await w(0.1)
+	check(h.stage.script_id == "balanca", "A Balança leva à memória do vinho")
+	h.stage.skip()
+	while h.mode != "explore":
+		await w(0.1)
+	check(State.has("coracao"), "A memória termina com o coração de Anselmo")
+	h.subs.clear()
+	h.go("cellar")
+	await w(2.2)
+	h.go("chapel")
+	await w(2.4)
+	check(h.view.id == "chapel" and State.flag("heart_placed"), "O coração vai para o relicário da capela")
+	check(h.available_puzzles().has("vitral"), "Com o coração no altar, a rosácea vira enigma")
+	h.subs.clear()
+	h.open_puzzle("vitral")
+	await w(0.3)
+	var vz = h.puzzle
+	for i in 36:
+		if not vz.fixed[i] and i != 35:
+			vz.grid[i] = vz.solution[i]
+	if vz.fixed[35]:
+		vz.finish()
+	else:
+		vz.place(35, vz.solution[35])
+	while h.stage == null:
+		await w(0.1)
+	check(h.stage.script_id == "vitral", "O Vitral leva à cena de Anselmo")
+	h.stage.skip()
+	while h.mode != "explore":
+		await w(0.1)
+	check(State.is_solved("vitral") and State.flag("cripta_open"), "Anselmo libertado; a cripta abre")
+	var crypt := false
+	for hs in h.view.hotspots:
+		if hs["action"] == "event:crypt":
+			crypt = true
+	check(crypt, "Atrás do altar, a passagem para a cripta")
+	var souls := 0
+	for id in h.SOULS:
+		if State.is_solved(id):
+			souls += 1
+	check(h.SOULS.size() == 7 and souls == 6 and not State.is_solved("atlas"), "Sete almas na casa; só a do Atlas (que o teste pulou) segue presa")
+
+	# 10. Salvar e carregar.
 	State.qa = false
 	State.save_game()
 	var before := State.solved.duplicate()

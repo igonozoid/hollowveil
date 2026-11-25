@@ -2,14 +2,15 @@
 
 Horror em primeira pessoa com enigmas e cenas fantasmas em vista lateral. Godot 4.7, só GDScript, sem nenhuma imagem ou som externo: os cômodos, os personagens, o sangue, a trilha e os efeitos são gerados por código. O design completo está em [../docs/design/GDD.md](../docs/design/GDD.md).
 
-Esta versão traz o **térreo** e o **1º andar** completos:
+Esta versão traz o **térreo** e o **1º andar** completos e a **primeira parte dos porões**:
 - **Cômodos do térreo:** saguão, porta de entrada, sala de jantar, biblioteca, cozinha, estufa e sala de música.
 - **Cômodos do 1º andar:** corredor, quartos de Celeste, de hóspedes e de Ofélia, banheiro e berçário.
-- **Onze enigmas:** A Ceia, O Atlas, Olhos no Pote, As Veias, A Prancheta, A Partitura, A Caixa de Música, O Banho, A Pele, O Móbile e Os Sussurros.
-- **Seis cenas de morte** (Leocádia, Tobias, Benedita, Celeste, Hélio e Ofélia) e **uma de memória**, a do berço vazio.
+- **Cômodos dos porões:** galeria, adega, câmara fria e capela. Lá embaixo, Dália carrega uma lamparina que segue o cursor.
+- **Catorze enigmas:** A Ceia, O Atlas, Olhos no Pote, As Veias, A Prancheta, A Partitura, A Caixa de Música, O Banho, A Pele, O Móbile, Os Sussurros, A Balança, Os Ganchos e O Vitral.
+- **Sete cenas de morte** (Leocádia, Tobias, Benedita, Celeste, Hélio, Ofélia e o padre Anselmo) e **duas de memória**: o berço vazio e o vinho do jantar.
 - **Sistemas:** pistas da Prancheta, sanidade e salvamento automático.
 
-A demonstração termina no alçapão da cozinha, que desce para os porões.
+A demonstração termina atrás do altar da capela, na passagem para a cripta.
 
 ## Jogar
 
@@ -25,6 +26,7 @@ Com o Godot instalado normalmente, use `godot --path game`.
 |---|---|
 | Andar, examinar, abrir enigma | clique (o cursor muda conforme a ação) |
 | Adiantar fala | clique |
+| Andar n'Os Ganchos | setas ou WASD (Z desfaz) |
 | Sair do enigma / pular cena / pausar | Esc |
 | Tela cheia | F11 |
 
@@ -53,10 +55,11 @@ tests/run_tests.sh
 ```
 
 Ele confere:
-- a Ceia tem solução única e os Olhos no Pote têm saída em 60 sementes;
+- cada enigma gerado por semente tem solução (e, quando deve, solução única) em 16 a 60 sementes;
+- a Balança só se resolve com a estratégia certa, e os Ganchos pedem exatamente o mínimo de empurrões calculado;
 - a Prancheta dá as pistas 1 e 2 e, na terceira, Morvant resolve o enigma;
 - Esc fecha o enigma e pausa o jogo;
-- as portas e as travas respeitam o progresso;
+- as portas e as travas respeitam o progresso, do saguão até a cripta;
 - salvar e carregar preservam o progresso.
 
 Com `-- --qa`, o jogo não grava o save e aceita atalhos de teste:
@@ -71,7 +74,7 @@ Com `-- --qa`, o jogo não grava o save e aceita atalhos de teste:
 
 | Script | Para que serve |
 |---|---|
-| `tools/bake_music.gd` | Gera `music/*.wav` com a mesma síntese de `scripts/audio/synth.gd`. Sem esses arquivos, cada faixa é gerada na primeira vez que toca, o que deixa alguns segundos de silêncio. |
+| `tools/bake_music.gd` | Gera `music/*.wav` com a mesma síntese de `scripts/audio/synth.gd`. Sem esses arquivos, cada faixa é gerada na primeira vez que toca, o que deixa alguns segundos de silêncio. Só gera as faixas que faltam; `-- --all` refaz todas. |
 | `tools/make_theme.gd` | Gera `resources/ui_theme.tres` a partir de `scripts/ui/theme.gd`. |
 
 ```bash
@@ -87,7 +90,7 @@ scripts/
   gfx/       perspectiva dos cômodos, luzes, pós-processamento, sangue
   ui/        tema, cursor, legendas, HUD da sanidade, menu, opções
   house/     motor de vistas e os cômodos (views/)
-  puzzles/   A Ceia, O Atlas, Olhos no Pote
+  puzzles/   um script por enigma
   ghosts/    palco das cenas fantasmas e os roteiros de morte
 ```
 
