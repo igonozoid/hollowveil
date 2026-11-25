@@ -341,6 +341,14 @@ func _draw_actor(a: Actor) -> void:
 		"garrafa":
 			draw_line(hand, hand + dir * 5.0, Color(0.12, 0.25, 0.12), 2.0)
 			draw_line(hand + dir * 5.0, hand + dir * 14.0, Color(0.1, 0.22, 0.1), 4.0)
+		"embrulho":
+			# Uma trouxinha de linho branco, pequena demais.
+			draw_circle(hand + dir * 2.0, 4.0, Color(0.88, 0.86, 0.8))
+			draw_rect(Rect2(hand + dir * 2.0 + Vector2(-5, -2), Vector2(9, 5)), Color(0.88, 0.86, 0.8))
+		"lamparina":
+			draw_line(hand, hand + Vector2(0, 6), Color(0.3, 0.28, 0.26), 1.0)
+			draw_rect(Rect2(hand + Vector2(-2, 6), Vector2(4, 5)), Color(1.0, 0.75, 0.35))
+			draw_circle(hand + Vector2(0, 8), 14.0, Color(1.0, 0.7, 0.3, 0.08))
 		"coracao":
 			# O coração ainda bate na mão dele.
 			var beat := maxf(0.0, sin(t * 7.0)) ** 6.0
@@ -624,6 +632,29 @@ func _props_vitral() -> void:
 		draw_rect(Rect2(x, 250, 46, 5), Color(0.24, 0.14, 0.08))
 		draw_rect(Rect2(x + 40, 226, 5, 50), Color(0.24, 0.14, 0.08))
 		draw_rect(Rect2(x + 2, 255, 4, 21), Color(0.2, 0.12, 0.07))
+
+
+func _props_ossuario() -> void:
+	_stone_wall()
+	# Nichos com crânios no fundo.
+	for row in 4:
+		for col in 12:
+			var r := Rect2(150 + col * 30, 40 + row * 26, 24, 20)
+			draw_rect(r, Color(0.02, 0.02, 0.03))
+			if (row * 7 + col * 3) % 5 != 0:
+				draw_circle(r.get_center() + Vector2(0, 2), 7, Color(0.5, 0.46, 0.38))
+				draw_rect(Rect2(r.get_center() + Vector2(-4, 0), Vector2(3, 3)), Color(0.02, 0.02, 0.02))
+				draw_rect(Rect2(r.get_center() + Vector2(1, 0), Vector2(3, 3)), Color(0.02, 0.02, 0.02))
+	# Pedestal e o caixãozinho branco.
+	draw_rect(Rect2(290, 240, 70, 36), Color(0.22, 0.22, 0.25))
+	draw_rect(Rect2(298, 228, 54, 12), Color(0.86, 0.84, 0.8))
+	draw_rect(Rect2(298, 226, 54, 3), Color(0.94, 0.92, 0.88))
+	_candles(280, 240)
+	_candles(372, 240)
+	# Sarcófagos dos lados.
+	for x in [40, 520]:
+		draw_rect(Rect2(x, 236, 90, 40), Color(0.4, 0.39, 0.37))
+		draw_rect(Rect2(x - 4, 230, 98, 7), Color(0.55, 0.54, 0.5))
 
 
 # ---------------------------------------------------------------- roteiros
@@ -1226,4 +1257,53 @@ func scene_vitral() -> void:
 	await _w(4.6)
 	_tw(soul, "alpha", 0.0, 1.0)
 	await _w(1.2)
+	_end()
+
+
+## Memória, não morte: o enterro de Benjamim e a noite em que o caixão abriu.
+func scene_ossuario() -> void:
+	prop_draw = _props_ossuario
+	var cel := _actor("cel", {"x": 270.0, "y": FLOOR + 10.0, "facing": 1.0, "kind": "woman", "sit": 1.0, "lean": 0.4, "arm_f": 1.1, "alpha": 0.8})
+	var ans := _actor("ans", {"x": 400.0, "facing": -1.0, "kind": "priest", "arm_f": 1.4, "alpha": 0.8})
+	var host := _actor("host", {"x": 200.0, "facing": 1.0, "kind": "host"})
+	await _w(1.0)
+	_sfx("bell", -8.0, 0.8)
+	_say("ANSELMO", "Benjamim Morvant. Nasceu e morreu no mesmo dia. Requiescat in pace.")
+	await _w(3.8)
+	_say("CELESTE", "Ele é tão pequeno, Ezequiel. Cabia inteiro nas minhas duas mãos.")
+	await _w(3.8)
+	_say("MORVANT", "Ele não vai ficar aqui embaixo, Celeste.")
+	await _w(3.0)
+	_say("ANSELMO", "Doutor, a morte de uma criança não é uma pergunta. Deixe que ela descanse.")
+	await _w(3.8)
+	_tw(cel, "alpha", 0.0, 2.0)
+	_tw(ans, "alpha", 0.0, 2.0)
+	_tw(host, "alpha", 0.0, 2.0)
+	await _w(2.4)
+	_say("", "Na mesma noite.")
+	await _w(2.4)
+	host.x = -30.0
+	host.tool = "lamparina"
+	_tw(host, "alpha", 1.0, 0.5)
+	_walk_to(host, 290.0, 3.0)
+	await _w(3.2)
+	host.tool = ""
+	_tw(host, "arm_f", 1.4, 0.4)
+	await _w(0.5)
+	_sfx("door", -6.0, 1.6)
+	_shake(0.3)
+	await _w(1.0)
+	_tw(host, "arm_f", 0.9, 0.6)
+	host.tool = "embrulho"
+	await _w(0.8)
+	_say("MORVANT", "Vamos, filho. O papai preparou um quarto lá no alto. Um teatro inteiro, só para você.")
+	await _w(4.4)
+	_walk_to(host, 700.0, 4.0)
+	await _w(1.6)
+	_sfx("cry", -8.0, 1.0)
+	await _w(2.6)
+	_say("DÁLIA", "Ele tirou o próprio filho do caixão. Benjamim está lá em cima, no teatro do sótão.")
+	await _w(4.2)
+	_say("DÁLIA", "E os números desta parede... alguém continuou contando os crânios depois disso.")
+	await _w(3.8)
 	_end()

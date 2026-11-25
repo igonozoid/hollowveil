@@ -48,7 +48,7 @@ Não há atos, capítulos nem telas de carregamento. O jogo é uma só casa, que
 | Térreo | Saguão, Sala de jantar, Biblioteca, Cozinha, Sala de música, Estufa | 6 | 4 | Desde o início |
 | 1º andar | Corredor, quartos de Celeste, Ofélia e dos hóspedes, Banheiro, Berçário vazio | 7 | 3 | 3 almas (a escada de serviço) |
 | Porões | Galeria, Adega, Câmara fria, Capela, Cripta, Labirinto das fundações | 5 | 3 | 6 almas (o alçapão da cozinha) |
-| Sótão e torre | Sótão, Teatro Anatômico, Torre do relógio | 5 | 2 + finais | 7 almas (a escadaria principal destrava) |
+| Sótão e torre | Sótão, Teatro Anatômico, Torre do relógio | 5 | 2 + finais | 7 almas e a saída do labirinto (a escadaria principal destrava) |
 
 - **Voltar sempre vale a pena.** Andares já abertos continuam acessíveis e mudam com o progresso: sangue novo, objetos fora do lugar, sustos novos e relíquias que só aparecem depois.
 - **Cada andar tem clima próprio** (paleta, trilha e gradação de cor), que muda com uma transição suave na escada, sem corte.
@@ -130,13 +130,13 @@ Chega-se pelo alçapão da cozinha, aberto por Ofélia. Uma **galeria de pedra e
 | **Adega** | **A Balança** | Nove potes de órgãos, um mais pesado (o coração). Duas pesagens numa balança de pratos | Desempate de Morvant, que escolhe o pote pesado depois de cada pesagem, sempre o pior para o jogador | Cena de memória: o láudano no vinho do jantar. Dália leva o coração de Anselmo |
 | **Câmara fria** | **Os Ganchos** | Empurrar três corpos pendurados em trolleys até os ralos; só empurrar, nunca puxar | Sala e posição inicial. Uma busca de trás para a frente, a partir dos ralos, escolhe a posição que pede mais empurrões (até 24) | A chave da capela, presa no gelo |
 | **Capela** | **O Vitral** | Rosácea 6×6 em seis painéis de 2×3: cada cor uma vez por linha, coluna e painel | Vitral embaralhado e vidros retirados enquanto a solução continua única | Alma de Anselmo (cena de morte); a passagem para a cripta |
-| Cripta | — | (próxima leva) | — | — |
-| Labirinto das fundações | — | (próxima leva) | — | Sobe à escadaria principal, que leva ao sótão |
+| **Cripta** | **O Ossuário** | Nonograma 10×10 na parede de nichos: os números entalhados contam os crânios seguidos em cada linha e coluna | Uma de seis figuras (crânio, chave, caixão, olho, mão, coração), talvez espelhada; todas se resolvem só por linha e coluna | Cena de memória: o enterro de Benjamim e a noite em que Morvant o tira do caixão. Os nichos cedem e abrem as fundações |
+| **Fundações** | **O Labirinto** | Labirinto 9×9 em primeira pessoa, passo a passo e viradas de 90°, como nos jogos de masmorra antigos; mapa de giz do que já foi pisado | Labirinto com alguns atalhos; a saída fica na casa mais distante da entrada | Depois de 12 passos, uma coisa pálida rasteja atrás de Dália, uma casa a cada dois passos dela. Se alcança: sanidade e volta à entrada. A saída sobe por um poço até debaixo da escadaria do saguão, que leva ao sótão |
 
 - **Ordem livre:** a adega e a câmara fria abrem desde a chegada. A capela precisa da chave (Ganchos); a rosácea só acende quando o coração (Balança) volta ao relicário do altar.
 - **A Balança não aceita chute:** Morvant decide qual pote é o pesado só depois de cada pesagem, dentro do que a balança já mostrou. Só a estratégia dos três grupos de três garante o coração. A pista 2 dá uma terceira pesagem.
-- **Pronto:** galeria, adega, câmara fria e capela, com A Balança, Os Ganchos, O Vitral, a memória do vinho e a morte de Anselmo. A demonstração termina na passagem atrás do altar.
-- **Próxima leva:** a cripta (o caixãozinho de Benjamim, vazio) e o labirinto em primeira pessoa nas fundações, que sai na escadaria principal e abre o sótão.
+- **A coisa do labirinto** nunca encurrala Dália: começa na entrada, atrás dela, e é mais lenta. Os atalhos deixam rotas de fuga. A pista 2 risca setas de giz no caminho mais curto e marca a saída no mapa.
+- **Pronto:** os porões inteiros. A demonstração termina ao subir a escadaria principal para o sótão.
 
 ## 7. Arte
 

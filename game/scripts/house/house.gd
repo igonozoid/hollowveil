@@ -22,6 +22,7 @@ const VIEWS := {
 	"wine_cellar": preload("res://scripts/house/views/wine_cellar.gd"),
 	"cold_room": preload("res://scripts/house/views/cold_room.gd"),
 	"chapel": preload("res://scripts/house/views/chapel.gd"),
+	"crypt": preload("res://scripts/house/views/crypt.gd"),
 }
 const PUZZLES := {
 	"ceia": preload("res://scripts/puzzles/ceia.gd"),
@@ -38,11 +39,13 @@ const PUZZLES := {
 	"balanca": preload("res://scripts/puzzles/balanca.gd"),
 	"ganchos": preload("res://scripts/puzzles/ganchos.gd"),
 	"vitral": preload("res://scripts/puzzles/vitral.gd"),
+	"ossuario": preload("res://scripts/puzzles/ossuario.gd"),
+	"labirinto": preload("res://scripts/puzzles/labirinto.gd"),
 }
 ## Enigmas que libertam uma alma (e têm cena de morte). Os outros só abrem caminho.
 const SOULS := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral"]
 ## Enigmas que levam a uma cena (almas e memórias).
-const SCENES := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral", "movel", "balanca"]
+const SCENES := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral", "movel", "balanca", "ossuario"]
 const GhostStage := preload("res://scripts/ghosts/ghost_stage.gd")
 const Subtitles := preload("res://scripts/ui/subtitles.gd")
 const Hud := preload("res://scripts/ui/hud.gd")
@@ -81,6 +84,8 @@ const LOOK := {
 	"reliquary_full": "O coração bate dentro do relicário. Cada batida acende a rosácea um pouco mais.",
 	"rose_after": "A rosácea brilha sozinha. A cruz, o peixe, a chave, o cálice, a estrela e o olho, cada um no seu lugar.",
 	"altar_after": "A toalha do altar está encharcada. Atrás dele, a parede parece mais fina.",
+	"small_coffin": "O forro de cetim tem a marca de um corpo do tamanho de um gato. Ainda morno. Na tampa: \"Benjamim, 1910\".",
+	"ossuary_after": "Os crânios do meio caíram para dentro. Do buraco vem um ar frio e um cheiro de terra molhada.",
 }
 const LOCKED := {
 	"stairs": "Um peso no peito me empurra de volta. Ainda não.",
@@ -384,6 +389,15 @@ func _reward(id: String, by_host: bool) -> void:
 			State.set_flag("cripta_open")
 			hud.notify("A CRIPTA\nAtrás do altar, uma laje de pedra se moveu sozinha.")
 			subs.say("MORVANT", "Sete almas, médium. Só falta a sua. E o meu filho espera lá embaixo, na cripta.")
+		"ossuario":
+			State.set_flag("fundacoes_open")
+			hud.notify("AS FUNDAÇÕES\nOs nichos do meio cederam. Atrás deles, um túnel desce sob a casa.")
+			subs.say("MORVANT", "Lá embaixo é escuro e ele está com fome, médium. Ande depressa e não volte por onde veio.")
+		"labirinto":
+			State.set_flag("sotao_open")
+			hud.notify("A ESCADARIA PRINCIPAL\nO poço sai debaixo da escada do saguão. O peso no peito sumiu.")
+			subs.say("MORVANT", "Você saiu. Ninguém sai. Suba, então. Meu filho e eu esperamos no teatro.")
+			_emerge_in_foyer.call_deferred()
 		"pele":
 			hud.notify("A PELE DE HÉLIO\nUma âncora, uma rosa e a palavra \"Mãe\".")
 			subs.say("MORVANT", "Pele boa, bem curtida pelo sol. Serviu de capa para o meu diário.")
@@ -422,11 +436,11 @@ func _event(id: String) -> void:
 		"ofelia_door":
 			Audio.play("whisper", -4.0, 1.2)
 			subs.say("OFÉLIA", ["Você ouve a gente. Eu sei que ouve. Mas só abro se disser o nome dele.", "O nome. O nome do menino do berço. Diga, e eu abro."][int(State.play_time) % 2])
-		"crypt":
+		"attic":
 			busy = true
-			Audio.play("slam", -6.0, 0.5)
-			Audio.play("bell", -10.0, 0.7)
-			subs.say("DÁLIA", "Atrás do altar, a laje deixa uma fresta. Uma escada desce ainda mais fundo. Lá embaixo, um bebê chora.")
+			Audio.play("door", -6.0, 0.6)
+			Audio.play("cry", -10.0, 0.95)
+			subs.say("DÁLIA", "A escadaria range sob o meu peso, degrau por degrau. Lá em cima, alguém nina um bebê com uma voz que não é de ninguém.")
 			await subs.finished
 			var tw4 := create_tween()
 			tw4.tween_property(fade, "modulate:a", 1.0, 1.5)
@@ -448,6 +462,13 @@ func _event(id: String) -> void:
 			slice_finished.emit()
 
 
+## O poço das fundações sobe até debaixo da escadaria do saguão.
+func _emerge_in_foyer() -> void:
+	await get_tree().create_timer(2.5).timeout
+	if mode == "explore" and not busy:
+		go("foyer")
+
+
 ## Enigmas já alcançáveis e ainda abertos, na ordem em que costumam aparecer.
 func available_puzzles() -> Array:
 	var out: Array = []
@@ -465,8 +486,10 @@ func available_puzzles() -> Array:
 		"balanca": State.flag("porao_open"),
 		"ganchos": State.flag("porao_open"),
 		"vitral": State.flag("heart_placed") and State.has("chave_capela"),
+		"ossuario": State.flag("cripta_open"),
+		"labirinto": State.flag("fundacoes_open"),
 	}
-	for id in ["ceia", "veias", "atlas", "prancheta", "olhos", "partitura", "banho", "caixa", "pele", "movel", "sussurros", "balanca", "ganchos", "vitral"]:
+	for id in ["ceia", "veias", "atlas", "prancheta", "olhos", "partitura", "banho", "caixa", "pele", "movel", "sussurros", "balanca", "ganchos", "vitral", "ossuario", "labirinto"]:
 		if gates[id] and not State.is_solved(id):
 			out.append(id)
 	return out

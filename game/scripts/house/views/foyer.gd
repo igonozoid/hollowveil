@@ -76,7 +76,10 @@ func paint() -> void:
 			var eye := portrait_rect.position + Vector2(portrait_rect.size.x * (0.42 + k * 0.16), portrait_rect.size.y * 0.42)
 			draw_rect(Rect2(eye, Vector2(1, portrait_rect.size.y * 0.5 + k * 3)), Color(0.55, 0.0, 0.02))
 	# Hotspots (ordem: os de trás primeiro)
-	hot(Rect2(stairs_top.x - 60, stairs_top.y - 10, 120, 70), "locked", "locked:stairs", "Escadaria")
+	if State.flag("sotao_open"):
+		hot(Rect2(stairs_top.x - 60, stairs_top.y - 10, 120, 70), "walk", "event:attic", "Subir ao sótão")
+	else:
+		hot(Rect2(stairs_top.x - 60, stairs_top.y - 10, 120, 70), "locked", "locked:stairs", "Escadaria")
 	hot(portrait_rect, "voice", "event:portrait", "Retrato")
 	hot(dining, "walk", "go:dining", "Sala de jantar")
 	if lib_open:

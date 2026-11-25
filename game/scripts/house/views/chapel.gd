@@ -95,7 +95,7 @@ func paint() -> void:
 	if freed:
 		hot(rose_rect, "look", "look:rose_after", "A rosácea")
 		if State.flag("cripta_open"):
-			hot(altar, "walk", "event:crypt", "Atrás do altar")
+			hot(altar, "walk", "go:crypt", "Descer à cripta")
 		else:
 			hot(altar, "look", "look:altar_after", "O altar")
 	elif lit:

@@ -376,6 +376,8 @@ static func make(name: String) -> PackedFloat32Array:
 			return _fx_bell()
 		"ice":
 			return _fx_ice()
+		"cry":
+			return _fx_cry()
 	return _buf(0.05)
 
 
@@ -689,4 +691,26 @@ static func _fx_ice() -> PackedFloat32Array:
 			next = t + nz.rng.randf_range(0.01, 0.09)
 		amp *= 0.993
 		b[i] = nz.band(0.2, 0.9) * amp * 0.8
+	return b
+
+
+## Choro de bebê, longe: "uéé" em formante, com soluço no fim.
+static func _fx_cry() -> PackedFloat32Array:
+	var b := _buf(2.4)
+	var nz := Hiss.new(31)
+	var ph := 0.0
+	for i in b.size():
+		var t := float(i) / RATE
+		var cyc := fmod(t, 0.8)
+		var f := 430.0 + 90.0 * sin(cyc / 0.8 * PI) + 12.0 * sin(t * 38.0)
+		ph += TAU * f / RATE
+		var env := sin(minf(cyc / 0.62, 1.0) * PI) if cyc < 0.62 else 0.0
+		# Formantes de "é": realça harmônicos perto de 600 e 2000 Hz.
+		var s := 0.0
+		for h in range(1, 7):
+			var hf := f * h
+			var wgt := exp(-pow((hf - 600.0) / 250.0, 2.0)) + 0.6 * exp(-pow((hf - 2000.0) / 400.0, 2.0)) + 0.15 / h
+			s += sin(ph * h) * wgt
+		b[i] = (s * 0.3 + nz.band(0.2, 0.8) * 0.05) * env * (1.0 - t / 2.6)
+	_reverb(b, 0.7, 0.7)
 	return b

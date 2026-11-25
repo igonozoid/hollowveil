@@ -2,15 +2,15 @@
 
 Horror em primeira pessoa com enigmas e cenas fantasmas em vista lateral. Godot 4.7, só GDScript, sem nenhuma imagem ou som externo: os cômodos, os personagens, o sangue, a trilha e os efeitos são gerados por código. O design completo está em [../docs/design/GDD.md](../docs/design/GDD.md).
 
-Esta versão traz o **térreo** e o **1º andar** completos e a **primeira parte dos porões**:
+Esta versão traz o **térreo**, o **1º andar** e os **porões** completos:
 - **Cômodos do térreo:** saguão, porta de entrada, sala de jantar, biblioteca, cozinha, estufa e sala de música.
 - **Cômodos do 1º andar:** corredor, quartos de Celeste, de hóspedes e de Ofélia, banheiro e berçário.
-- **Cômodos dos porões:** galeria, adega, câmara fria e capela. Lá embaixo, Dália carrega uma lamparina que segue o cursor.
-- **Catorze enigmas:** A Ceia, O Atlas, Olhos no Pote, As Veias, A Prancheta, A Partitura, A Caixa de Música, O Banho, A Pele, O Móbile, Os Sussurros, A Balança, Os Ganchos e O Vitral.
-- **Sete cenas de morte** (Leocádia, Tobias, Benedita, Celeste, Hélio, Ofélia e o padre Anselmo) e **duas de memória**: o berço vazio e o vinho do jantar.
+- **Cômodos dos porões:** galeria, adega, câmara fria, capela, cripta e o labirinto das fundações, em primeira pessoa. Lá embaixo, Dália carrega uma lamparina que segue o cursor.
+- **Dezesseis enigmas:** A Ceia, O Atlas, Olhos no Pote, As Veias, A Prancheta, A Partitura, A Caixa de Música, O Banho, A Pele, O Móbile, Os Sussurros, A Balança, Os Ganchos, O Vitral, O Ossuário e O Labirinto.
+- **Sete cenas de morte** (Leocádia, Tobias, Benedita, Celeste, Hélio, Ofélia e o padre Anselmo) e **três de memória**: o berço vazio, o vinho do jantar e o enterro de Benjamim.
 - **Sistemas:** pistas da Prancheta, sanidade e salvamento automático.
 
-A demonstração termina atrás do altar da capela, na passagem para a cripta.
+A demonstração termina na escadaria principal do saguão, ao subir para o sótão.
 
 ## Jogar
 
@@ -27,6 +27,8 @@ Com o Godot instalado normalmente, use `godot --path game`.
 | Andar, examinar, abrir enigma | clique (o cursor muda conforme a ação) |
 | Adiantar fala | clique |
 | Andar n'Os Ganchos | setas ou WASD (Z desfaz) |
+| Andar n'O Labirinto | W/↑ avança, S/↓ recua, A/← e D/→ viram |
+| O Ossuário | clique ou arraste põe crânios; botão direito marca com giz |
 | Sair do enigma / pular cena / pausar | Esc |
 | Tela cheia | F11 |
 
@@ -57,9 +59,10 @@ tests/run_tests.sh
 Ele confere:
 - cada enigma gerado por semente tem solução (e, quando deve, solução única) em 16 a 60 sementes;
 - a Balança só se resolve com a estratégia certa, e os Ganchos pedem exatamente o mínimo de empurrões calculado;
+- toda figura do Ossuário se resolve só por linha e coluna, e no Labirinto o caminho mais curto escapa da coisa;
 - a Prancheta dá as pistas 1 e 2 e, na terceira, Morvant resolve o enigma;
 - Esc fecha o enigma e pausa o jogo;
-- as portas e as travas respeitam o progresso, do saguão até a cripta;
+- as portas e as travas respeitam o progresso, do saguão até a escadaria do sótão;
 - salvar e carregar preservam o progresso.
 
 Com `-- --qa`, o jogo não grava o save e aceita atalhos de teste:

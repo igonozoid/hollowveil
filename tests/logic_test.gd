@@ -243,6 +243,35 @@ func _run() -> void:
 		gan_ok = gan_ok and n == gz.depth and n >= 14 and not gz.solved_now()
 		gan_min = mini(gan_min, n)
 		gz.free()
+	var Ossuario = load("res://scripts/puzzles/ossuario.gd")
+	var Labirinto = load("res://scripts/puzzles/labirinto.gd")
+	var oss_ok := true
+	var lab_ok := true
+	var lab_min := 99
+	for s in 60:
+		State.seed_value = s * 3331 + 9
+		State.drafts = {}
+		var os = Ossuario.new()
+		var rng5 := RandomNumberGenerator.new()
+		rng5.seed = State.puzzle_seed("ossuario")
+		os.pick_figure(rng5)
+		var solved_grid: Array = Ossuario.line_solve(os.row_clues, os.col_clues)
+		oss_ok = oss_ok and solved_grid == os.image
+		os.free()
+		var lb = Labirinto.new()
+		var rng6 := RandomNumberGenerator.new()
+		rng6.seed = State.puzzle_seed("labirinto")
+		lb.generate(rng6)
+		lb._restart()
+		var path: Array = lb.shortest(lb.start, lb.exit)
+		lab_min = mini(lab_min, path.size())
+		for c in path:
+			var d: int = lb.DIRS.find(c - lb.pos)
+			lab_ok = lab_ok and lb.move(d) and lb.caught_t == 0.0
+		lab_ok = lab_ok and lb.done
+		lb.free()
+	check(oss_ok, "O Ossuário: toda figura se resolve só por linha e coluna (solução única), em 60 sementes")
+	check(lab_ok, "O Labirinto: o caminho mais curto chega à saída sem a coisa alcançar Dália (mínimo de %d passos)" % lab_min)
 	check(gan_ok, "Os Ganchos: a busca para trás acerta o mínimo de empurrões, em 16 sementes (mínimo %d)" % gan_min)
 
 	# 2. Prancheta: pista 1, pista 2, e na terceira Morvant resolve.
@@ -511,7 +540,7 @@ func _run() -> void:
 	check(State.is_solved("vitral") and State.flag("cripta_open"), "Anselmo libertado; a cripta abre")
 	var crypt := false
 	for hs in h.view.hotspots:
-		if hs["action"] == "event:crypt":
+		if hs["action"] == "go:crypt":
 			crypt = true
 	check(crypt, "Atrás do altar, a passagem para a cripta")
 	var souls := 0
@@ -520,7 +549,44 @@ func _run() -> void:
 			souls += 1
 	check(h.SOULS.size() == 7 and souls == 6 and not State.is_solved("atlas"), "Sete almas na casa; só a do Atlas (que o teste pulou) segue presa")
 
-	# 10. Salvar e carregar.
+	# 10. Cripta → ossuário → memória → fundações → labirinto → escadaria.
+	h.subs.clear()
+	h.go("crypt")
+	await w(2.4)
+	check(h.view.id == "crypt" and h.available_puzzles().has("ossuario"), "Chega à cripta; o ossuário é o enigma")
+	h.subs.clear()
+	h.open_puzzle("ossuario")
+	await w(0.3)
+	var oz = h.puzzle
+	for i in 100:
+		if oz.image[i] == 1:
+			oz.set_cell(i, 1)
+	while h.stage == null:
+		await w(0.1)
+	check(h.stage.script_id == "ossuario", "O Ossuário leva à memória do enterro")
+	h.stage.skip()
+	while h.mode != "explore":
+		await w(0.1)
+	check(State.flag("fundacoes_open") and h.available_puzzles().has("labirinto"), "A parede cede: as fundações abrem")
+	h.subs.clear()
+	h.open_puzzle("labirinto")
+	await w(0.3)
+	var lz = h.puzzle
+	for c in lz.shortest(lz.pos, lz.exit):
+		lz.move(lz.DIRS.find(c - lz.pos))
+	while h.puzzle != null or h.mode != "explore":
+		await w(0.1)
+	check(State.flag("sotao_open"), "Sair do labirinto destrava a escadaria")
+	h.subs.clear()
+	await w(5.0)
+	check(h.view.id == "foyer", "O poço sai no saguão")
+	var attic := false
+	for hs in h.view.hotspots:
+		if hs["action"] == "event:attic":
+			attic = true
+	check(attic, "A escadaria sobe ao sótão")
+
+	# 11. Salvar e carregar.
 	State.qa = false
 	State.save_game()
 	var before := State.solved.duplicate()

@@ -58,7 +58,8 @@ func finish() -> void:
 		return
 	done = true
 	back.disabled = true
-	get_tree().create_timer(2.2).timeout.connect(func(): solved.emit())
+	if is_inside_tree():
+		get_tree().create_timer(2.2).timeout.connect(func(): solved.emit())
 
 
 ## Texto de pista (nível 1 ou 2). Sobrescrever com static func hint().
