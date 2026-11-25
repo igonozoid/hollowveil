@@ -2,14 +2,14 @@
 
 Horror em primeira pessoa com enigmas e cenas fantasmas em vista lateral. Godot 4.7, só GDScript, sem nenhuma imagem ou som externo: os cômodos, os personagens, o sangue, a trilha e os efeitos são gerados por código. O design completo está em [../docs/design/GDD.md](../docs/design/GDD.md).
 
-Esta versão traz o **térreo completo** e a **primeira leva do 1º andar**:
+Esta versão traz o **térreo** e o **1º andar** completos:
 - **Cômodos do térreo:** saguão, porta de entrada, sala de jantar, biblioteca, cozinha, estufa e sala de música.
-- **Cômodos do 1º andar:** corredor, quarto de Celeste, banheiro e quarto de hóspedes.
-- **Nove enigmas:** A Ceia, O Atlas, Olhos no Pote, As Veias, A Prancheta, A Partitura, A Caixa de Música, O Banho e A Pele.
-- **Cinco cenas de morte:** Leocádia, Tobias, Benedita, Celeste e o Capitão Hélio.
+- **Cômodos do 1º andar:** corredor, quartos de Celeste, de hóspedes e de Ofélia, banheiro e berçário.
+- **Onze enigmas:** A Ceia, O Atlas, Olhos no Pote, As Veias, A Prancheta, A Partitura, A Caixa de Música, O Banho, A Pele, O Móbile e Os Sussurros.
+- **Seis cenas de morte** (Leocádia, Tobias, Benedita, Celeste, Hélio e Ofélia) e **uma de memória**, a do berço vazio.
 - **Sistemas:** pistas da Prancheta, sanidade e salvamento automático.
 
-A demonstração termina na porta de Ofélia. O berçário e o quarto dela são a segunda leva do andar.
+A demonstração termina no alçapão da cozinha, que desce para os porões.
 
 ## Jogar
 

@@ -16,6 +16,8 @@ const VIEWS := {
 	"celeste_room": preload("res://scripts/house/views/celeste_room.gd"),
 	"bathroom": preload("res://scripts/house/views/bathroom.gd"),
 	"guest_room": preload("res://scripts/house/views/guest_room.gd"),
+	"nursery": preload("res://scripts/house/views/nursery.gd"),
+	"ofelia_room": preload("res://scripts/house/views/ofelia_room.gd"),
 }
 const PUZZLES := {
 	"ceia": preload("res://scripts/puzzles/ceia.gd"),
@@ -27,9 +29,13 @@ const PUZZLES := {
 	"caixa": preload("res://scripts/puzzles/caixa.gd"),
 	"banho": preload("res://scripts/puzzles/banho.gd"),
 	"pele": preload("res://scripts/puzzles/pele.gd"),
+	"movel": preload("res://scripts/puzzles/movel.gd"),
+	"sussurros": preload("res://scripts/puzzles/sussurros.gd"),
 }
 ## Enigmas que libertam uma alma (e têm cena de morte). Os outros só abrem caminho.
-const SOULS := ["ceia", "atlas", "olhos", "partitura", "pele"]
+const SOULS := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros"]
+## Enigmas que levam a uma cena (almas e memórias).
+const SCENES := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "movel"]
 const GhostStage := preload("res://scripts/ghosts/ghost_stage.gd")
 const Subtitles := preload("res://scripts/ui/subtitles.gd")
 const Hud := preload("res://scripts/ui/hud.gd")
@@ -54,6 +60,10 @@ const LOOK := {
 	"bath_mirror": "Alguém escreve no vapor com o dedo, do lado de dentro do espelho.",
 	"skin_after": "A âncora, a rosa e a palavra \"Mãe\". A pele ainda tem cheiro de tabaco.",
 	"cards": "Trinca de damas contra um par de setes. O capitão nunca soube a hora de parar.",
+	"crib_after": "O móbile gira devagar sobre o berço vazio. O lençol tem a marca de um corpo muito pequeno.",
+	"rocker": "A cadeira balança. Quando eu olho, ela para. Quando desvio o olhar, recomeça.",
+	"circle_after": "As velas apagaram sozinhas. O giz está borrado, como se alguém tivesse se arrastado para fora do círculo.",
+	"ofelia_desk": "Cadernos de escola cheios de nomes. Todos de pessoas mortas na casa. O meu está na última página.",
 }
 const LOCKED := {
 	"stairs": "Um peso no peito me empurra de volta. Ainda não.",
@@ -63,6 +73,7 @@ const LOCKED := {
 	"music": "Trancada. Do outro lado, alguém afina a voz. Bato e o canto para.",
 	"guest": "Trancada. A fechadura é de latão, com um 3 gravado.",
 	"nursery": "Trancado. Do outro lado, um móbile gira sem vento.",
+	"trapdoor": "Um alçapão no chão, pregado por dentro. Lá embaixo, alguém reza em latim.",
 }
 
 var view_root := Node2D.new()
@@ -256,7 +267,7 @@ func _on_solved(id: String) -> void:
 
 ## Depois de resolver: cena de morte para as almas; recompensa direta para o resto.
 func after_solve(id: String, by_host: bool) -> void:
-	if id in SOULS:
+	if id in SCENES:
 		play_ghost(id, by_host)
 		return
 	mode = "explore"
@@ -336,6 +347,13 @@ func _reward(id: String, by_host: bool) -> void:
 		"caixa":
 			hud.notify("A CANÇÃO DE NINAR\nUma fechadura estalou do outro lado do corredor.")
 			subs.say("MORVANT", "Era a canção do berçário. Celeste cantava para um berço vazio.")
+		"movel":
+			State.set_flag("nome_benjamim")
+			hud.notify("BENJAMIM\nO nome do filho que nasceu morto. Ofélia vai querer ouvir.")
+		"sussurros":
+			State.set_flag("porao_open")
+			hud.notify("O ALÇAPÃO DA COZINHA\nOfélia abriu o caminho para os porões.")
+			subs.say("MORVANT", "Desça, médium. O padre Anselmo adora uma confissão.")
 		"pele":
 			hud.notify("A PELE DE HÉLIO\nUma âncora, uma rosa e a palavra \"Mãe\".")
 			subs.say("MORVANT", "Pele boa, bem curtida pelo sol. Serviu de capa para o meu diário.")
@@ -371,14 +389,13 @@ func _event(id: String) -> void:
 				subs.say("DÁLIA", "A voz de Celeste. Ainda não sei como devolver. Ainda.")
 			else:
 				subs.say("DÁLIA", "Uma coisa pálida vibra dentro do vidro, como uma corda que alguém dedilha.")
-		"nursery":
-			Audio.play("door", -8.0, 1.3)
-			subs.say("DÁLIA", "A porta do berçário cede um dedo e para. Alguma coisa pequena empurra do outro lado.")
-			subs.say("", "(O berçário ainda está sendo construído.)")
 		"ofelia_door":
-			busy = true
 			Audio.play("whisper", -4.0, 1.2)
-			subs.say("OFÉLIA", "Você ouve a gente. Eu sei que ouve. Mas ainda não está pronta para me ver.")
+			subs.say("OFÉLIA", ["Você ouve a gente. Eu sei que ouve. Mas só abro se disser o nome dele.", "O nome. O nome do menino do berço. Diga, e eu abro."][int(State.play_time) % 2])
+		"trapdoor":
+			busy = true
+			Audio.play("door", -4.0, 0.6)
+			subs.say("DÁLIA", "O alçapão abre sozinho. Uma escada de pedra desce para o frio. Lá embaixo, um padre reza.")
 			await subs.finished
 			var tw3 := create_tween()
 			tw3.tween_property(fade, "modulate:a", 1.0, 1.5)
@@ -412,8 +429,10 @@ func available_puzzles() -> Array:
 		"banho": State.is_solved("olhos"),
 		"caixa": State.is_solved("olhos"),
 		"pele": State.has("chave_hospedes"),
+		"movel": State.is_solved("caixa"),
+		"sussurros": State.flag("nome_benjamim"),
 	}
-	for id in ["ceia", "veias", "atlas", "prancheta", "olhos", "partitura", "banho", "caixa", "pele"]:
+	for id in ["ceia", "veias", "atlas", "prancheta", "olhos", "partitura", "banho", "caixa", "pele", "movel", "sussurros"]:
 		if gates[id] and not State.is_solved(id):
 			out.append(id)
 	return out

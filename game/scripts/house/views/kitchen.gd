@@ -71,6 +71,22 @@ func paint() -> void:
 		for i in 5:
 			var fp := p.proj(Vector3(0.3 + i * 0.3, 0.0, 2.6 + (i % 2) * 0.4))
 			draw_rect(Rect2(fp, Vector2(4, 1)), Color(0.35, 0.0, 0.02))
+	# Alçapão no chão, perto da porta da escada.
+	var trap_open := State.flag("porao_open")
+	var tp := [Vector3(-2.3, 0.004, 3.1), Vector3(-1.3, 0.004, 3.1), Vector3(-1.3, 0.004, 3.9), Vector3(-2.3, 0.004, 3.9)]
+	p.poly3(tp, Color(0.02, 0.01, 0.01) if trap_open else Color(0.3, 0.2, 0.12), not trap_open)
+	if trap_open:
+		for k in 4:
+			p.line3(Vector3(-2.1, 0.005, 3.2 + k * 0.18), Vector3(-1.5, 0.005, 3.2 + k * 0.18), Color(0.35, 0.25, 0.15), 1.0)
+		p.add_light(Vector3(-1.8, -0.5, 3.5), Color(1.0, 0.5, 0.25), 1.2, 0.6, 0.4, 30.0)
+	else:
+		for k in 5:
+			p.line3(Vector3(-2.3 + k * 0.25, 0.005, 3.1), Vector3(-2.3 + k * 0.25, 0.005, 3.9), Color(0.16, 0.1, 0.06), 1.0)
+	var trap := p.rect_of(tp)
+	if trap_open:
+		hot(trap, "walk", "event:trapdoor", "Descer aos porões")
+	else:
+		hot(trap, "locked", "locked:trapdoor", "Alçapão")
 	if open:
 		hot(stair_door, "walk", "go:corridor", "Subir ao 1º andar")
 		hot(pantry, "look", "look:pantry_after", "Despensa")

@@ -158,6 +158,24 @@ func _run() -> void:
 	check(caixa_ok, "A Caixa de Música: a busca alinha as engrenagens em 60 sementes")
 	check(banho_ok, "O Banho: sempre há uma sequência de despejos até a medida")
 	check(pele_ok, "A Pele: árvore com 24 ligações, embaralhada e resolvível")
+	var Movel = load("res://scripts/puzzles/movel.gd")
+	var Sussurros = load("res://scripts/puzzles/sussurros.gd")
+	var movel_ok := true
+	var sus_ok := true
+	for s in 60:
+		State.seed_value = s * 6007 + 11
+		State.drafts = {}
+		var mv = Movel.new()
+		mv.build()
+		movel_ok = movel_ok and mv._count_solutions() == 1 and mv._balanced(mv.solution)
+		mv.free()
+		var su = Sussurros.new()
+		su.build()
+		var spots: Array = su.consistent_spots()
+		sus_ok = sus_ok and spots.size() == 1 and spots[0] == su.answer
+		su.free()
+	check(movel_ok, "O Móbile: exatamente um jeito de equilibrar, em 60 sementes")
+	check(sus_ok, "Os Sussurros: um único esconderijo consistente, em 60 sementes")
 	check(solvable, "Olhos no Pote tem saída em 60 sementes")
 
 	# 2. Prancheta: pista 1, pista 2, e na terceira Morvant resolve.
@@ -294,7 +312,61 @@ func _run() -> void:
 		await w(0.1)
 	check(State.is_solved("pele"), "Hélio libertado")
 
-	# 8. Salvar e carregar.
+	# 8. Berçário → nome → Ofélia → alçapão.
+	h.subs.clear()
+	State.mark_solved("caixa")
+	h.after_solve("caixa", false)
+	await w(0.3)
+	h.subs.clear()
+	check(h.available_puzzles().has("movel"), "A canção da caixa abre o berçário")
+	h.go("corridor")
+	await w(2.2)
+	h.go("nursery")
+	await w(2.2)
+	check(h.view.id == "nursery", "Chega ao berçário")
+	h.open_puzzle("movel")
+	await w(0.3)
+	h.puzzle.finish()
+	while h.stage == null:
+		await w(0.1)
+	check(h.stage.script_id == "movel", "O Móbile leva à memória do berço vazio")
+	h.stage.skip()
+	while h.mode != "explore":
+		await w(0.1)
+	check(State.flag("nome_benjamim"), "A memória revela o nome Benjamim")
+	h.subs.clear()
+	h.go("corridor")
+	await w(2.2)
+	var ofelia_open := false
+	for hs in h.view.hotspots:
+		if hs["action"] == "go:ofelia_room":
+			ofelia_open = true
+	check(ofelia_open, "O nome abre a porta de Ofélia")
+	h.go("ofelia_room")
+	await w(2.2)
+	h.subs.clear()
+	h.open_puzzle("sussurros")
+	await w(0.3)
+	h.puzzle._choose(h.puzzle.answer)
+	while h.stage == null:
+		await w(0.1)
+	check(h.stage.script_id == "sussurros", "Os Sussurros levam à cena de Ofélia")
+	h.stage.skip()
+	while h.mode != "explore":
+		await w(0.1)
+	check(State.is_solved("sussurros") and State.flag("porao_open"), "Ofélia libertada; o alçapão abre")
+	h.subs.clear()
+	h.go("corridor")
+	await w(2.2)
+	h.go("kitchen")
+	await w(2.2)
+	var trap := false
+	for hs in h.view.hotspots:
+		if hs["action"] == "event:trapdoor":
+			trap = true
+	check(trap, "O alçapão da cozinha leva aos porões")
+
+	# 9. Salvar e carregar.
 	State.qa = false
 	State.save_game()
 	var before := State.solved.duplicate()

@@ -325,6 +325,14 @@ func _draw_actor(a: Actor) -> void:
 		"bisturi":
 			draw_line(hand, hand + dir * 6.0, Color(0.85, 0.87, 0.9), 1.0)
 			draw_rect(Rect2(hand + dir * 6.0 - Vector2(0.5, 0.5), Vector2(1, 1)), Color(1, 1, 1))
+		"trepano":
+			# Arco de pua: manivela em "U" e a broca na ponta.
+			var side := dir.orthogonal()
+			draw_line(hand, hand + dir * 5.0, Color(0.5, 0.35, 0.2), 2.0)
+			draw_line(hand + dir * 5.0, hand + dir * 5.0 + side * 6.0, Color(0.6, 0.6, 0.62), 1.0)
+			draw_line(hand + dir * 5.0 + side * 6.0, hand + dir * 12.0 + side * 6.0, Color(0.6, 0.6, 0.62), 1.0)
+			draw_line(hand + dir * 12.0 + side * 6.0, hand + dir * 12.0, Color(0.6, 0.6, 0.62), 1.0)
+			draw_line(hand + dir * 12.0, hand + dir * 18.0, Color(0.8, 0.8, 0.82), 1.0)
 		"colher":
 			draw_line(hand, hand + dir * 7.0, Color(0.7, 0.7, 0.72), 1.0)
 			draw_circle(hand + dir * 8.0, 1.5, Color(0.7, 0.7, 0.72))
@@ -486,6 +494,57 @@ func _props_pele() -> void:
 	for x in [240, 404]:
 		draw_rect(Rect2(x, 220, 4, 56), Color(0.2, 0.1, 0.06))
 		draw_rect(Rect2(x - 6 if x > 300 else x, 248, 22, 4), Color(0.2, 0.1, 0.06))
+
+
+func _props_movel() -> void:
+	_wall(Color(0.22, 0.2, 0.24), Color(0.12, 0.1, 0.13), Color(0.17, 0.15, 0.19))
+	_window(500, 120)
+	# Berço vazio, com o móbile parado
+	draw_rect(Rect2(280, 224, 90, 6), Color(0.42, 0.34, 0.26))
+	for i in 10:
+		draw_rect(Rect2(282 + i * 9, 230, 2, 28), Color(0.42, 0.34, 0.26))
+	draw_rect(Rect2(280, 256, 90, 6), Color(0.42, 0.34, 0.26))
+	for x in [280, 366]:
+		draw_rect(Rect2(x, 220, 4, 56), Color(0.36, 0.28, 0.2))
+	draw_line(Vector2(366, 220), Vector2(366, 170), Color(0.42, 0.34, 0.26), 1.0)
+	draw_line(Vector2(366, 170), Vector2(326, 170), Color(0.42, 0.34, 0.26), 1.0)
+	for k in 4:
+		var mx := 312.0 + k * 9.0 + sin(t * 0.5 + k) * 2.0
+		draw_line(Vector2(mx, 172), Vector2(mx, 182 + k % 2 * 4), Color(0.7, 0.68, 0.6), 1.0)
+		draw_circle(Vector2(mx, 184 + k % 2 * 4), 2.0, [Color(0.9, 0.85, 0.5), Color(0.7, 0.75, 0.9), Color(0.9, 0.6, 0.6), Color(0.75, 0.9, 0.7)][k])
+	# Caixãozinho branco no chão, fechado.
+	draw_rect(Rect2(160, 262, 46, 14), Color(0.62, 0.6, 0.58))
+	draw_rect(Rect2(160, 262, 46, 3), Color(0.7, 0.68, 0.66))
+	# Cadeira de balanço de Celeste
+	var rock := sin(t * 1.4) * 2.0
+	draw_line(Vector2(226, 276 + rock * 0.3), Vector2(266, 276 - rock * 0.3), Color(0.3, 0.22, 0.16), 2.0)
+	draw_rect(Rect2(232, 247, 26, 4), Color(0.3, 0.22, 0.16))
+	draw_line(Vector2(234, 251), Vector2(234, 275), Color(0.3, 0.22, 0.16), 2.0)
+	draw_line(Vector2(256, 251), Vector2(256, 275), Color(0.3, 0.22, 0.16), 2.0)
+	draw_line(Vector2(233, 249), Vector2(228 + rock, 206), Color(0.3, 0.22, 0.16), 2.0)
+	_candles(184, 262)
+
+
+func _props_sussurros() -> void:
+	_wall(Color(0.2, 0.17, 0.24), Color(0.11, 0.09, 0.13), Color(0.15, 0.12, 0.18))
+	for i in 14:
+		draw_string(ThemeDB.fallback_font, Vector2(40 + fmod(i * 97.0, 560.0), 50 + fmod(i * 53.0, 170.0)), ["ELES FALAM", "PAI NÃO", "ouço"][i % 3], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(0.08, 0.05, 0.08))
+	_window(500, 110)
+	# Cama de renda
+	draw_rect(Rect2(180, 236, 160, 12), Color(0.82, 0.8, 0.82))
+	draw_rect(Rect2(180, 248, 160, 10), Color(0.62, 0.6, 0.62))
+	draw_rect(Rect2(180, 210, 8, 66), Color(0.3, 0.2, 0.16))
+	draw_rect(Rect2(332, 226, 8, 50), Color(0.3, 0.2, 0.16))
+	draw_rect(Rect2(188, 228, 30, 8), Color(0.92, 0.9, 0.92))
+	# Bonecas na prateleira
+	draw_rect(Rect2(420, 170, 120, 4), Color(0.3, 0.2, 0.16))
+	for k in 6:
+		var dx := 428.0 + k * 19.0
+		draw_rect(Rect2(dx - 4, 158, 8, 12), [Color(0.6, 0.3, 0.35), Color(0.4, 0.4, 0.6)][k % 2])
+		draw_circle(Vector2(dx, 154), 4.0, Color(0.85, 0.76, 0.7))
+		draw_rect(Rect2(dx - 2, 153, 1, 1), Color(0.05, 0.05, 0.1))
+		draw_rect(Rect2(dx + 1, 153, 1, 1), Color(0.05, 0.05, 0.1))
+	_candles(400, 276)
 
 
 # ---------------------------------------------------------------- roteiros
@@ -828,6 +887,100 @@ func scene_pele() -> void:
 	else:
 		_say("HÉLIO", "A menina viu tudo pela fechadura. Ofélia. Ela não abre a porta para ninguém. Talvez abra para você.")
 	await _w(4.6)
+	_tw(soul, "alpha", 0.0, 1.0)
+	await _w(1.2)
+	_end()
+
+
+## Memória, não morte: o berço vazio e o motivo de Morvant.
+func scene_movel() -> void:
+	prop_draw = _props_movel
+	var cel := _actor("cel", {"x": 250.0, "facing": 1.0, "kind": "woman", "sit": 1.0, "arm_f": 1.2, "alpha": 0.8})
+	var host := _actor("host", {"x": 700.0, "facing": -1.0, "kind": "host"})
+	await _w(1.0)
+	_say("CELESTE", "Dorme, Benjamim, que a noite é comprida... dorme, que a mãe fica.")
+	for i in 6:
+		_tw(cel, "lean", 0.18 if i % 2 == 0 else -0.06, 0.5)
+		await _w(0.55)
+	_walk_to(host, 420.0, 2.4)
+	await _w(2.6)
+	_say("MORVANT", "Você canta para um berço vazio há três meses, Celeste.")
+	await _w(3.4)
+	_say("CELESTE", "Ele nasceu sem respirar, Ezequiel. Deixe-o ir. Por favor.")
+	await _w(3.6)
+	_say("MORVANT", "A morte é uma porta. Eu só preciso montar a chave.")
+	await _w(3.2)
+	_say("MORVANT", "Uma voz para chamá-lo. Olhos para encontrá-lo. Mãos para trazê-lo de volta.")
+	await _w(4.0)
+	_tw(cel, "sit", 0.0, 0.6)
+	await _w(0.6)
+	_say("CELESTE", "Você está falando dos nossos convidados. Ezequiel... dos nossos convidados?")
+	await _w(3.6)
+	_sfx("laugh", -8.0, 0.8)
+	_say("MORVANT", "Benjamim vai voltar. E você vai cantar para ele de novo. Não do jeito que imagina.")
+	await _w(4.4)
+	_tw(cel, "alpha", 0.0, 2.0)
+	_tw(host, "alpha", 0.0, 2.0)
+	await _w(2.2)
+	_say("DÁLIA", "Benjamim. O filho deles. Foi por ele que Morvant abriu o véu.")
+	await _w(3.6)
+	_end()
+
+
+func scene_sussurros() -> void:
+	prop_draw = _props_sussurros
+	surfaces = [Rect2(180, 236, 160, 12)]
+	blood.floor_y = FLOOR
+	blood.walls = [Rect2(60, 40, 520, 200)]
+	var ofe := _actor("ofe", {"x": 260.0, "y": 238.0, "facing": 1.0, "kind": "woman", "sit": 1.0, "arm_f": 1.3, "arm_b": 1.2, "alpha": 0.85})
+	var host := _actor("host", {"x": 700.0, "facing": -1.0, "kind": "host"})
+	await _w(1.2)
+	_say("OFÉLIA", "Eles estão com medo, pai. Todos. Até o capitão está chorando lá no seu quarto.")
+	await _w(3.6)
+	_walk_to(host, 340.0, 2.4)
+	await _w(2.6)
+	_say("MORVANT", "Eles têm razão de ter medo. Você não, filha. É só o seu dom que eu quero.")
+	await _w(3.6)
+	host.tool = "trepano"
+	_say("OFÉLIA", "Pai? Pai, os mortos estão gritando. O que é isso na sua mão?")
+	await _w(2.6)
+	_walk_to(host, 288.0, 0.6)
+	await _w(0.6)
+	host.facing = -1.0
+	_tw(host, "arm_f", 1.9, 0.2)
+	ofe.tremble = 1.0
+	_sfx("scream", -4.0, 1.5)
+	await _w(0.4)
+	# A broca entra pela têmpora.
+	for i in 10:
+		_sfx("saw", -10.0, 2.2)
+		var head := part("ofe", "head")
+		blood.spray(head, Vector2(-1, -0.6), 10, 120.0, 0.6, 1.4)
+		blood.drip(head + Vector2(randf_range(-3, 3), 4), 40.0)
+		_shake(0.25)
+		await _w(0.24)
+	_sfx("crunch", -2.0, 1.4)
+	blood.spray(part("ofe", "head"), Vector2(-1, -0.2), 60, 200.0, 0.6, 2.0)
+	_shake(1.0)
+	flash = 0.35
+	ofe.tremble = 0.0
+	_tw(ofe, "lean", -1.2, 0.8)
+	await _w(1.0)
+	_sfx("slam", -10.0, 1.3)
+	blood.pool(Vector2(250, 238.0), 18.0)
+	await _w(0.8)
+	_say("MORVANT", "Pronto. Agora eu também ouço. Que barulho eles fazem, Ofélia.")
+	await _w(3.8)
+	var soul := _actor("soul", {"x": 260.0, "y": 238.0, "facing": 1.0, "kind": "woman", "alpha": 0.0})
+	_tw(soul, "alpha", 0.8, 1.5)
+	_tw(soul, "rise", 44.0, 2.5)
+	_sfx("whisper", -4.0, 1.3)
+	await _w(2.0)
+	if host_version:
+		_say("MORVANT", "Minha filha não tem nada a dizer, médium. Eu fiquei com o dom dela, lembra?")
+	else:
+		_say("OFÉLIA", "Ele vai fazer o mesmo com você, Dália. O padre ainda reza lá embaixo, na capela. Desça pelo alçapão da cozinha.")
+	await _w(5.0)
 	_tw(soul, "alpha", 0.0, 1.0)
 	await _w(1.2)
 	_end()

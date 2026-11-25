@@ -115,11 +115,11 @@ Chega-se pela escada de serviço da cozinha. O andar inteiro é um **corredor lo
 | **Quarto de Celeste** | **A Caixa de Música** | Cinco engrenagens em corrente: girar uma gira as vizinhas no sentido contrário; alinhar todas as marcas | Posição inicial (embaralhada a partir do alinhado) | A canção de ninar que destranca o berçário |
 | **Banheiro** | **O Banho** | Transvasar sangue entre três frascos até medir a quantidade exata que o ralo aceita | Capacidades e alvo (sempre com solução, verificada por busca) | A banheira esvazia: chave do quarto de hóspedes |
 | **Quarto de hóspedes** | **A Pele** | A pele tatuada de Hélio, costurada em 25 retalhos: girar cada retalho até a tatuagem virar um desenho contínuo | Árvore de linhas e rotações iniciais | Alma de Hélio (cena de morte) |
-| Berçário vazio | O Móbile | Equilibrar pesos num móbile de berço | Pesos e braços | Cena de memória (sem morte): o filho que nasceu morto e o motivo de Morvant |
-| Quarto de Ofélia | Os Sussurros | Quatro mortos falam; um mente. Descobrir quem, pela lógica | Falas e o mentiroso | Alma de Ofélia; a escadaria principal começa a ceder |
+| **Berçário vazio** | **O Móbile** | Pendurar 4 de 5 brinquedos para equilibrar três barras (peso × marcas igual dos dois lados) | Pesos e braços, com uma única solução | Cena de memória (sem morte): o filho que nasceu morto e o motivo de Morvant |
+| **Quarto de Ofélia** | **Os Sussurros** | Quatro mortos dizem onde está o diário; um mente. Só um esconderijo deixa uma única frase falsa | Falas e mentiroso, com resposta única | Alma de Ofélia; o alçapão da cozinha abre para os porões |
 
 - **Ordem livre:** o quarto de Celeste e o banheiro estão abertos desde a chegada. O banheiro abre o quarto de hóspedes; a caixa de música abre o berçário; o berçário revela o que abre a porta de Ofélia.
-- **Primeira leva (pronta):** corredor, quarto de Celeste, banheiro e quarto de hóspedes. **Segunda leva:** berçário e quarto de Ofélia.
+- **Pronto:** o andar inteiro. A porta de Ofélia só abre quando Dália diz o nome do filho morto, Benjamim, revelado na memória do berçário.
 
 ## 7. Arte
 

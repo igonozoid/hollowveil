@@ -64,10 +64,13 @@ func paint() -> void:
 	else:
 		hot(guest, "locked", "locked:guest", "Quarto de hóspedes")
 	if State.is_solved("caixa"):
-		hot(nursery, "voice", "event:nursery", "Berçário")
+		hot(nursery, "walk", "go:nursery", "Berçário")
 	else:
 		hot(nursery, "locked", "locked:nursery", "Berçário")
-	hot(ofelia, "voice", "event:ofelia_door", "Quarto de Ofélia")
+	if State.flag("nome_benjamim"):
+		hot(ofelia, "walk", "go:ofelia_room", "Quarto de Ofélia")
+	else:
+		hot(ofelia, "voice", "event:ofelia_door", "Quarto de Ofélia")
 	hot_back("go:kitchen", "Descer a escada de serviço")
 
 
