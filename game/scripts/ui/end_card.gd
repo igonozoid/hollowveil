@@ -22,10 +22,10 @@ func _ready() -> void:
 			host += 1
 	var mins := int(State.play_time / 60.0)
 	var souls := 0
-	for id in ["ceia", "atlas", "olhos", "partitura"]:
+	for id in ["ceia", "atlas", "olhos", "partitura", "pele"]:
 		if State.is_solved(id):
 			souls += 1
-	label.text = "A ESCADA DE SERVIÇO\n\n" + ("%d de 4 almas do térreo libertadas. " % souls) + ("Ninguém ficou para trás." if souls == 4 else "Alguém ainda canta lá embaixo.") + "\n\nTempo: %d min   ·   Sanidade: %d%%   ·   Pistas: %d   ·   Resolvidos por Morvant: %d\n\n\nO 1º ANDAR AINDA ESTÁ SENDO CONSTRUÍDO\nfim da demonstração\n\n\nclique para voltar ao menu" % [mins, int(State.sanity), hints, host]
+	label.text = "A PORTA DE OFÉLIA\n\n" + ("%d de 5 almas libertadas até aqui. " % souls) + ("Ninguém ficou para trás." if souls == 5 else "Alguém ainda espera nos cômodos que você deixou.") + "\n\nTempo: %d min   ·   Sanidade: %d%%   ·   Pistas: %d   ·   Resolvidos por Morvant: %d\n\n\nO BERÇÁRIO E O QUARTO DE OFÉLIA AINDA ESTÃO SENDO CONSTRUÍDOS\nfim da demonstração\n\n\nclique para voltar ao menu" % [mins, int(State.sanity), hints, host]
 	add_child(label)
 	Audio.music("menu")
 

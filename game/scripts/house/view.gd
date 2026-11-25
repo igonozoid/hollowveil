@@ -13,6 +13,8 @@ const Light := preload("res://scripts/gfx/light.gd")
 var id := ""
 var title := ""
 var music := "terreo"
+## Gradação de cor do pós-processamento (post_fx.GRADES).
+var grade := "terreo"
 var p: Persp
 var hotspots: Array = []
 var glass: Array = []

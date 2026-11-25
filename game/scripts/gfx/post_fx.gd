@@ -9,6 +9,7 @@ const GRADES := {
 	"fantasma": [Color(0.3, 0.45, 0.55), Color(0.85, 1.0, 0.95), 0.5, 0.8],
 	"menu": [Color(0.3, 0.36, 0.5), Color(1.0, 0.86, 0.7), 0.4, 0.95],
 	"enigma": [Color(0.4, 0.36, 0.34), Color(1.0, 0.88, 0.7), 0.3, 1.0],
+	"quartos": [Color(0.42, 0.32, 0.56), Color(1.0, 0.82, 0.82), 0.45, 0.95],
 }
 
 var mat: ShaderMaterial

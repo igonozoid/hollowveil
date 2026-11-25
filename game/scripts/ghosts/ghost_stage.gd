@@ -70,6 +70,7 @@ func _w(seconds: float) -> void:
 func _say(who: String, line: String) -> void:
 	if skipping or house == null:
 		return
+	house.subs.clear()
 	house.subs.say(who, line)
 
 
@@ -222,6 +223,10 @@ func _draw() -> void:
 				for f in 4:
 					draw_rect(Rect2(p + Vector2(-3 + f * 1.6, 1), Vector2(1, 2)), Color(0.75, 0.66, 0.6))
 				draw_rect(Rect2(p + Vector2(-4, -1), Vector2(2, 2)), Color(0.6, 0.0, 0.03))
+			"skin":
+				draw_rect(Rect2(p - Vector2(7, 3), Vector2(14, 6)), Color(0.8, 0.66, 0.58))
+				draw_line(p + Vector2(-5, 0), p + Vector2(5, -1), Color(0.12, 0.16, 0.3), 1.0)
+				draw_rect(Rect2(p + Vector2(-7, 2), Vector2(14, 1)), Color(0.55, 0.0, 0.03))
 			"eye":
 				draw_circle(p, 2.0, Color(0.92, 0.9, 0.85))
 				draw_rect(Rect2(p + Vector2(0, -1), Vector2(1, 1)), Color(0.15, 0.25, 0.4))
@@ -458,6 +463,29 @@ func _props_partitura() -> void:
 	for x in [60, 100, 560, 600]:
 		draw_rect(Rect2(x, 236, 4, 40), Color(0.22, 0.09, 0.08))
 		draw_rect(Rect2(x - 12, 254, 16, 4), Color(0.22, 0.09, 0.08))
+
+
+func _props_pele() -> void:
+	_wall(Color(0.13, 0.11, 0.16), Color(0.07, 0.06, 0.09), Color(0.1, 0.08, 0.12))
+	_window(520, 120)
+	# Mapa e cama de campanha
+	draw_rect(Rect2(90, 90, 80, 56), Color(0.55, 0.48, 0.34))
+	draw_line(Vector2(100, 120), Vector2(160, 104), Color(0.5, 0.1, 0.08), 1.0)
+	draw_rect(Rect2(40, 246, 110, 14), Color(0.3, 0.32, 0.24))
+	draw_rect(Rect2(40, 238, 30, 8), Color(0.7, 0.68, 0.62))
+	# Mesa de cartas
+	draw_rect(Rect2(270, 230, 110, 6), Color(0.16, 0.34, 0.2))
+	draw_rect(Rect2(270, 236, 110, 4), Color(0.18, 0.1, 0.06))
+	for x in [278, 370]:
+		draw_rect(Rect2(x, 240, 4, 36), Color(0.18, 0.1, 0.06))
+	for i in 5:
+		draw_rect(Rect2(290 + i * 14, 227, 8, 3), Color(0.88, 0.86, 0.8))
+	draw_rect(Rect2(316, 224, 4, 6), Color(0.3, 0.12, 0.08))
+	_candles(360, 230)
+	# Cadeiras
+	for x in [240, 404]:
+		draw_rect(Rect2(x, 220, 4, 56), Color(0.2, 0.1, 0.06))
+		draw_rect(Rect2(x - 6 if x > 300 else x, 248, 22, 4), Color(0.2, 0.1, 0.06))
 
 
 # ---------------------------------------------------------------- roteiros
@@ -732,6 +760,73 @@ func scene_partitura() -> void:
 		_say("MORVANT", "Ela agradeceria, médium. Mas eu fiquei com a voz dela, lembra?")
 	else:
 		_say("CELESTE", "Ele guardou minha voz num vidro, lá em cima. Ofélia ouviu tudo. Ofélia ouve tudo.")
+	await _w(4.6)
+	_tw(soul, "alpha", 0.0, 1.0)
+	await _w(1.2)
+	_end()
+
+
+func scene_pele() -> void:
+	prop_draw = _props_pele
+	surfaces = [Rect2(270, 230, 110, 6)]
+	blood.walls = [Rect2(80, 60, 480, 170)]
+	var hel := _actor("hel", {"x": 252.0, "facing": 1.0, "kind": "man", "sit": 1.0, "arm_f": 1.4, "alpha": 0.8})
+	var host := _actor("host", {"x": 396.0, "facing": -1.0, "kind": "host", "sit": 1.0, "arm_f": 1.3})
+	await _w(1.2)
+	_say("HÉLIO", "Mais uma mão, doutor. Eu recupero tudo nesta.")
+	await _w(3.0)
+	_sfx("card", -4.0)
+	_say("MORVANT", "Você já não tem o que apostar, capitão.")
+	await _w(3.0)
+	_say("HÉLIO", "Tenho a minha palavra. E esta tatuagem custou mais que a sua casa.")
+	await _w(3.4)
+	_sfx("card", -4.0)
+	await _w(0.6)
+	_say("MORVANT", "Trinca de damas. Aceito a tatuagem.")
+	await _w(2.4)
+	_tw(hel, "lean", -0.3, 0.3)
+	_say("HÉLIO", "Foi uma piada, doutor... uma pia...")
+	await _w(1.4)
+	# O vinho estava batizado: o capitão tomba sobre a mesa.
+	hel.tremble = 1.0
+	_tw(hel, "lean", 1.3, 0.6)
+	await _w(0.7)
+	_sfx("slam", -8.0, 1.2)
+	hel.tremble = 0.0
+	_tw(host, "sit", 0.0, 0.4)
+	host.tool = "bisturi"
+	await _w(0.6)
+	_walk_to(host, 236.0, 1.4)
+	await _w(1.6)
+	host.facing = 1.0
+	for i in 8:
+		_tw(host, "arm_f", 1.9 - (i % 2) * 0.6, 0.18)
+		var back := part("hel", "shoulder").lerp(part("hel", "hip"), (i % 4) / 4.0)
+		blood.spray(back, Vector2(randf_range(-0.6, 0.6), -1), 14, 120.0, 0.7, 1.6)
+		_sfx("squelch", -4.0, randf_range(0.7, 1.0))
+		if i == 3:
+			_sfx("scream", -6.0, 0.8)
+		_shake(0.3)
+		await _w(0.34)
+	# A pele sai inteira, como um mapa.
+	_sfx("crunch", -2.0, 0.6)
+	gib(part("hel", "shoulder"), "skin", Vector2(-40, -150))
+	blood.spray(part("hel", "shoulder"), Vector2(0, -1), 60, 180.0, 0.8, 2.0)
+	_shake(1.0)
+	flash = 0.3
+	await _w(1.2)
+	_say("MORVANT", "Dívida de jogo se paga. Até a última pinta.")
+	blood.pool(Vector2(300, FLOOR), 26.0)
+	await _w(3.4)
+	var soul := _actor("soul", {"x": 252.0, "facing": 1.0, "kind": "man", "alpha": 0.0})
+	_tw(soul, "alpha", 0.7, 1.5)
+	_tw(soul, "rise", 36.0, 2.5)
+	_sfx("whisper", -6.0, 0.9)
+	await _w(2.0)
+	if host_version:
+		_say("MORVANT", "O capitão perdeu de novo, médium. Desta vez, para mim e para você.")
+	else:
+		_say("HÉLIO", "A menina viu tudo pela fechadura. Ofélia. Ela não abre a porta para ninguém. Talvez abra para você.")
 	await _w(4.6)
 	_tw(soul, "alpha", 0.0, 1.0)
 	await _w(1.2)

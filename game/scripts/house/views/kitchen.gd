@@ -72,7 +72,7 @@ func paint() -> void:
 			var fp := p.proj(Vector3(0.3 + i * 0.3, 0.0, 2.6 + (i % 2) * 0.4))
 			draw_rect(Rect2(fp, Vector2(4, 1)), Color(0.35, 0.0, 0.02))
 	if open:
-		hot(stair_door, "walk", "event:stairs_up", "Escada de serviço")
+		hot(stair_door, "walk", "go:corridor", "Subir ao 1º andar")
 		hot(pantry, "look", "look:pantry_after", "Despensa")
 	else:
 		hot(stair_door, "locked", "locked:service", "Escada de serviço")

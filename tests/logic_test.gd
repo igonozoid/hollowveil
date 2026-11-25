@@ -107,6 +107,57 @@ func _run() -> void:
 	check(veias_ok, "As Veias: o solucionador murcha todos os bulbos em 60 sementes")
 	check(cipher_ok, "A Prancheta: só a chave certa decifra a mensagem, em 60 sementes")
 	check(melody_ok, "A Partitura: nenhuma nota repetida em seguida")
+	# 1º andar: Caixa, Banho e Pele resolvíveis em 60 sementes.
+	var Caixa = load("res://scripts/puzzles/caixa.gd")
+	var Banho = load("res://scripts/puzzles/banho.gd")
+	var Pele = load("res://scripts/puzzles/pele.gd")
+	var caixa_ok := true
+	var banho_ok := true
+	var pele_ok := true
+	for s in 60:
+		State.seed_value = s * 7907 + 3
+		State.drafts = {}
+		var cx = Caixa.new()
+		cx.pos = []
+		var rngc := RandomNumberGenerator.new()
+		rngc.seed = State.puzzle_seed("caixa")
+		for i in 5:
+			cx.pos.append(0)
+		while cx._aligned():
+			for k in 9:
+				cx._turn(rngc.randi() % 5, 1 if rngc.randf() < 0.5 else -1, false)
+		var guard := 0
+		while not cx._aligned() and guard < 40:
+			var mv: Array = cx.next_move()
+			if mv.is_empty():
+				break
+			cx._turn(mv[0], mv[1], false)
+			guard += 1
+		caixa_ok = caixa_ok and cx._aligned()
+		cx.free()
+		var bh = Banho.new()
+		bh.build()
+		var path: Array = bh.path_from(bh.amt)
+		var st: Array = bh.amt.duplicate()
+		for mv2 in path:
+			if mv2.size() == 2:
+				st = bh._poured(st, mv2[0], mv2[1])
+		banho_ok = banho_ok and not path.is_empty() and bh._reached(st)
+		bh.free()
+		var pl = Pele.new()
+		pl.build()
+		var edges := 0
+		for i in 25:
+			for d in 4:
+				edges += (pl.base[i] >> d) & 1
+		var scrambled_bad: bool = not pl._solved()
+		for i in 25:
+			pl.rot[i] = 0
+		pele_ok = pele_ok and edges == 48 and scrambled_bad and pl._solved()
+		pl.free()
+	check(caixa_ok, "A Caixa de Música: a busca alinha as engrenagens em 60 sementes")
+	check(banho_ok, "O Banho: sempre há uma sequência de despejos até a medida")
+	check(pele_ok, "A Pele: árvore com 24 ligações, embaralhada e resolvível")
 	check(solvable, "Olhos no Pote tem saída em 60 sementes")
 
 	# 2. Prancheta: pista 1, pista 2, e na terceira Morvant resolve.
@@ -207,7 +258,43 @@ func _run() -> void:
 		await w(0.1)
 	check(State.is_solved("partitura") and h.available_puzzles().has("atlas"), "Celeste libertada; o Atlas segue disponível")
 
-	# 7. Salvar e carregar.
+	# 7. Subir ao 1º andar: banheiro → chave → quarto de hóspedes → Hélio.
+	State.mark_solved("olhos")
+	h.subs.clear()
+	h.go("dining")
+	await w(2.0)
+	h.go("kitchen")
+	await w(2.0)
+	var up := false
+	for hs in h.view.hotspots:
+		if hs["action"] == "go:corridor":
+			up = true
+	check(up, "Escada de serviço leva ao corredor")
+	h.go("corridor")
+	await w(2.5)
+	check(h.view.id == "corridor" and h.view.grade == "quartos", "Chega ao corredor do 1º andar")
+	h.subs.clear()
+	check(h.available_puzzles().has("banho") and h.available_puzzles().has("caixa"), "Banho e Caixa disponíveis ao chegar")
+	State.mark_solved("banho")
+	h.after_solve("banho", false)
+	await w(0.3)
+	check(State.has("chave_hospedes") and h.available_puzzles().has("pele"), "O Banho dá a chave do quarto de hóspedes")
+	h.subs.clear()
+	h.go("guest_room")
+	await w(2.5)
+	check(h.view.id == "guest_room", "Chave abre o quarto de hóspedes")
+	h.open_puzzle("pele")
+	await w(0.3)
+	h.puzzle.finish()
+	while h.stage == null:
+		await w(0.1)
+	check(h.stage.script_id == "pele", "A Pele leva à cena de Hélio")
+	h.stage.skip()
+	while h.mode != "explore":
+		await w(0.1)
+	check(State.is_solved("pele"), "Hélio libertado")
+
+	# 8. Salvar e carregar.
 	State.qa = false
 	State.save_game()
 	var before := State.solved.duplicate()

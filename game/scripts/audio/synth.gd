@@ -17,6 +17,8 @@ const TRACKS := {
 		"voices": ["cello", "harpsi", "pad"], "tick": true, "seed": 13},
 	"enigma": {"bpm": 72, "root": 40, "scale": PHRYG, "prog": [0, 1, 0, 6, 0, 1, 3, 1],
 		"voices": ["drone", "glass", "pulse"], "tick": true, "seed": 29},
+	"quartos": {"bpm": 54, "root": 44, "scale": MINOR, "prog": [0, 3, 5, 4, 0, 3, 1, 4],
+		"voices": ["pad", "musicbox", "cello"], "tick": false, "seed": 37},
 	"fantasma": {"bpm": 50, "root": 38, "scale": LOCRIAN, "prog": [0, 1, 0, 4, 0, 1, 6, 4],
 		"voices": ["cluster", "heart", "choir"], "tick": false, "seed": 31},
 }

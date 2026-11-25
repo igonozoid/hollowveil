@@ -32,7 +32,7 @@ Aos poucos, as cenas mostram o plano de Morvant. Ele tirou de cada pessoa uma pa
 | Benedita Assunção | Cozinheira da casa | Os olhos (ela viu demais) | Cozinha |
 | Celeste Morvant | Esposa, soprano | A voz | Sala de música |
 | Padre Anselmo Vidal | Confessor da família | O coração | Capela |
-| Capitão Hélio Sarmento | Militar e jogador | A pele tatuada | Sala de jogos |
+| Capitão Hélio Sarmento | Militar e jogador | A pele tatuada | Quarto de hóspedes |
 | Ofélia Morvant | Filha de 19 anos, médium de verdade | O "dom" | Quarto de Ofélia |
 | Dr. Ezequiel Morvant | O anfitrião | — | O Teatro Anatômico |
 
@@ -98,13 +98,28 @@ O **Saguão** é o centro de tudo: a escadaria, o retrato de Morvant (cujos olho
 | **Estufa** | **As Veias** | "Apague as luzes" 5×5: tocar um bulbo inverte ele e os vizinhos | Estado inicial, sempre solucionável (solucionador em GF(2)) |
 | **Saguão** | **A Prancheta** | Cifra com dois deslocamentos alternados, decifrada girando os anéis do Sol e da Lua | Mensagem e as duas chaves |
 
-Demais andares (rascunho): pesos e órgãos em balança, labirinto em primeira pessoa nas fundações, peças de xadrez com bisturis, caixas de música com engrenagens, transvaso de sangue entre frascos, ganchos de carne num quebra-cabeça de empurrar caixas na câmara fria e a montagem final do corpo no Teatro Anatômico.
+Porões e sótão (rascunho): pesos e órgãos em balança, labirinto em primeira pessoa nas fundações, ganchos de carne num quebra-cabeça de empurrar caixas na câmara fria e a montagem final do corpo no Teatro Anatômico.
 
 Ligações do térreo:
 - **Caminho 1:** a Ceia dá a chave de osso, que abre a biblioteca. O Atlas destranca a copa. Olhos no Pote libera a escada de serviço.
 - **Caminho 2:** a estufa devolve a lente da Prancheta. A cifra da Prancheta destranca a sala de música, onde fica a Partitura.
 
 Os dois caminhos podem ser jogados em paralelo, em qualquer ordem.
+
+## 6b. O 1º andar
+
+Chega-se pela escada de serviço da cozinha. O andar inteiro é um **corredor longo** com quatro portas laterais e, no fim, a porta de Ofélia, por baixo da qual escapa uma luz que tremula. Paleta roxa e lilás; a trilha é uma canção de ninar desafinada.
+
+| Cômodo | Enigma | Mecânica | Semente gera | Abre / revela |
+|---|---|---|---|---|
+| **Quarto de Celeste** | **A Caixa de Música** | Cinco engrenagens em corrente: girar uma gira as vizinhas no sentido contrário; alinhar todas as marcas | Posição inicial (embaralhada a partir do alinhado) | A canção de ninar que destranca o berçário |
+| **Banheiro** | **O Banho** | Transvasar sangue entre três frascos até medir a quantidade exata que o ralo aceita | Capacidades e alvo (sempre com solução, verificada por busca) | A banheira esvazia: chave do quarto de hóspedes |
+| **Quarto de hóspedes** | **A Pele** | A pele tatuada de Hélio, costurada em 25 retalhos: girar cada retalho até a tatuagem virar um desenho contínuo | Árvore de linhas e rotações iniciais | Alma de Hélio (cena de morte) |
+| Berçário vazio | O Móbile | Equilibrar pesos num móbile de berço | Pesos e braços | Cena de memória (sem morte): o filho que nasceu morto e o motivo de Morvant |
+| Quarto de Ofélia | Os Sussurros | Quatro mortos falam; um mente. Descobrir quem, pela lógica | Falas e o mentiroso | Alma de Ofélia; a escadaria principal começa a ceder |
+
+- **Ordem livre:** o quarto de Celeste e o banheiro estão abertos desde a chegada. O banheiro abre o quarto de hóspedes; a caixa de música abre o berçário; o berçário revela o que abre a porta de Ofélia.
+- **Primeira leva (pronta):** corredor, quarto de Celeste, banheiro e quarto de hóspedes. **Segunda leva:** berçário e quarto de Ofélia.
 
 ## 7. Arte
 

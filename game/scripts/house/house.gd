@@ -12,6 +12,10 @@ const VIEWS := {
 	"kitchen": preload("res://scripts/house/views/kitchen.gd"),
 	"greenhouse": preload("res://scripts/house/views/greenhouse.gd"),
 	"music": preload("res://scripts/house/views/music.gd"),
+	"corridor": preload("res://scripts/house/views/corridor.gd"),
+	"celeste_room": preload("res://scripts/house/views/celeste_room.gd"),
+	"bathroom": preload("res://scripts/house/views/bathroom.gd"),
+	"guest_room": preload("res://scripts/house/views/guest_room.gd"),
 }
 const PUZZLES := {
 	"ceia": preload("res://scripts/puzzles/ceia.gd"),
@@ -20,9 +24,12 @@ const PUZZLES := {
 	"veias": preload("res://scripts/puzzles/veias.gd"),
 	"prancheta": preload("res://scripts/puzzles/prancheta.gd"),
 	"partitura": preload("res://scripts/puzzles/partitura.gd"),
+	"caixa": preload("res://scripts/puzzles/caixa.gd"),
+	"banho": preload("res://scripts/puzzles/banho.gd"),
+	"pele": preload("res://scripts/puzzles/pele.gd"),
 }
 ## Enigmas que libertam uma alma (e têm cena de morte). Os outros só abrem caminho.
-const SOULS := ["ceia", "atlas", "olhos", "partitura"]
+const SOULS := ["ceia", "atlas", "olhos", "partitura", "pele"]
 const GhostStage := preload("res://scripts/ghosts/ghost_stage.gd")
 const Subtitles := preload("res://scripts/ui/subtitles.gd")
 const Hud := preload("res://scripts/ui/hud.gd")
@@ -39,6 +46,14 @@ const LOOK := {
 	"pantry_after": "Os potes que sobraram me acompanham com o olhar.",
 	"roots_after": "As raízes secaram em volta de uma mão. Ela segurava a lente da prancheta.",
 	"piano_music_after": "A tampa do piano ainda reflete alguém no palco. Não me viro para conferir.",
+	"musicbox_after": "A bailarina sem cabeça ainda gira, devagar, mesmo com a tampa fechada.",
+	"vanity_mirror": "No espelho oval, a cama atrás de mim está desarrumada. Na cama de verdade, não.",
+	"tub": "Cheia até a borda. Escura demais para ser água. Alguma coisa brilha no fundo.",
+	"tub_after": "A banheira esvaziou e deixou uma crosta vermelha. A chave já está comigo.",
+	"vials_after": "Os frascos ainda estão mornos.",
+	"bath_mirror": "Alguém escreve no vapor com o dedo, do lado de dentro do espelho.",
+	"skin_after": "A âncora, a rosa e a palavra \"Mãe\". A pele ainda tem cheiro de tabaco.",
+	"cards": "Trinca de damas contra um par de setes. O capitão nunca soube a hora de parar.",
 }
 const LOCKED := {
 	"stairs": "Um peso no peito me empurra de volta. Ainda não.",
@@ -46,6 +61,8 @@ const LOCKED := {
 	"pantry": "Travada por dentro. Do outro lado, alguém arrasta os pés.",
 	"service": "Uma tranca de ferro, sem buraco de chave. Só abre do outro lado.",
 	"music": "Trancada. Do outro lado, alguém afina a voz. Bato e o canto para.",
+	"guest": "Trancada. A fechadura é de latão, com um 3 gravado.",
+	"nursery": "Trancado. Do outro lado, um móbile gira sem vento.",
 }
 
 var view_root := Node2D.new()
@@ -103,7 +120,7 @@ func _show_view(id: String) -> void:
 	State.view = view.id
 	Audio.music(view.music)
 	if post:
-		post.grade("terreo")
+		post.grade(view.grade if view else "terreo")
 
 
 # ---------------------------------------------------------------- entrada
@@ -222,7 +239,7 @@ func _close_puzzle() -> void:
 	mode = "explore"
 	Audio.music(view.music)
 	if post:
-		post.grade("terreo")
+		post.grade(view.grade if view else "terreo")
 	State.save_game()
 
 
@@ -245,7 +262,7 @@ func after_solve(id: String, by_host: bool) -> void:
 	mode = "explore"
 	Audio.music(view.music)
 	if post:
-		post.grade("terreo")
+		post.grade(view.grade if view else "terreo")
 	view.queue_redraw()
 	_reward(id, by_host)
 
@@ -280,7 +297,7 @@ func play_ghost(id: String, host_version: bool) -> void:
 	mode = "explore"
 	Audio.music(view.music)
 	if post:
-		post.grade("terreo")
+		post.grade(view.grade if view else "terreo")
 	create_tween().tween_property(fade, "modulate:a", 0.0, 1.0)
 	_reward(id, host_version)
 
@@ -312,6 +329,16 @@ func _reward(id: String, by_host: bool) -> void:
 		"partitura":
 			hud.notify("A VOZ DE CELESTE\nLevada num vidro para o andar de cima.")
 			subs.say("MORVANT", "Agora ela canta só para mim. Lá em cima, onde a acústica é melhor.")
+		"banho":
+			State.give("chave_hospedes")
+			hud.notify("CHAVE DE LATÃO Nº 3\nEstava no fundo da banheira. Abre o quarto de hóspedes.")
+			subs.say("MORVANT", "O capitão tomava banhos de duas horas. Hoje ele não se importa com a demora.")
+		"caixa":
+			hud.notify("A CANÇÃO DE NINAR\nUma fechadura estalou do outro lado do corredor.")
+			subs.say("MORVANT", "Era a canção do berçário. Celeste cantava para um berço vazio.")
+		"pele":
+			hud.notify("A PELE DE HÉLIO\nUma âncora, uma rosa e a palavra \"Mãe\".")
+			subs.say("MORVANT", "Pele boa, bem curtida pelo sol. Serviu de capa para o meu diário.")
 	if by_host:
 		subs.say("DÁLIA", "Ele resolveu por mim. E levou alguma coisa junto... não lembro o rosto dela.")
 	State.save_game()
@@ -337,6 +364,26 @@ func _event(id: String) -> void:
 				open_puzzle("prancheta")
 			else:
 				_planchette()
+		"voice_jar":
+			Audio.play("whisper", -6.0, 1.8)
+			if State.is_solved("partitura"):
+				subs.say("CELESTE", "...me tire daqui... devolva para a minha garganta...")
+				subs.say("DÁLIA", "A voz de Celeste. Ainda não sei como devolver. Ainda.")
+			else:
+				subs.say("DÁLIA", "Uma coisa pálida vibra dentro do vidro, como uma corda que alguém dedilha.")
+		"nursery":
+			Audio.play("door", -8.0, 1.3)
+			subs.say("DÁLIA", "A porta do berçário cede um dedo e para. Alguma coisa pequena empurra do outro lado.")
+			subs.say("", "(O berçário ainda está sendo construído.)")
+		"ofelia_door":
+			busy = true
+			Audio.play("whisper", -4.0, 1.2)
+			subs.say("OFÉLIA", "Você ouve a gente. Eu sei que ouve. Mas ainda não está pronta para me ver.")
+			await subs.finished
+			var tw3 := create_tween()
+			tw3.tween_property(fade, "modulate:a", 1.0, 1.5)
+			await tw3.finished
+			slice_finished.emit()
 		"gramophone":
 			Audio.play("sting", -14.0, 1.6)
 			subs.say("", "O disco gira sozinho. Uma soprano canta, longe, e para no meio da frase.")
@@ -362,8 +409,11 @@ func available_puzzles() -> Array:
 		"olhos": State.flag("kitchen_open"),
 		"prancheta": State.flag("prancheta_ready"),
 		"partitura": State.flag("music_open"),
+		"banho": State.is_solved("olhos"),
+		"caixa": State.is_solved("olhos"),
+		"pele": State.has("chave_hospedes"),
 	}
-	for id in ["ceia", "veias", "atlas", "prancheta", "olhos", "partitura"]:
+	for id in ["ceia", "veias", "atlas", "prancheta", "olhos", "partitura", "banho", "caixa", "pele"]:
 		if gates[id] and not State.is_solved(id):
 			out.append(id)
 	return out
