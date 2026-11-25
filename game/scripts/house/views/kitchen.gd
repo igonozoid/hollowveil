@@ -105,3 +105,13 @@ func paint_live(o: Node2D) -> void:
 		o.draw_line(hook + Vector2(0, 6) * s, hook + Vector2(0, 32) * s, Color(0.82, 0.74, 0.62), maxf(1.0, s))
 		if State.gore:
 			o.draw_rect(Rect2(hook + Vector2(0, 36) * s, Vector2(1, 3 + fmod(t * 6.0 + i * 3.0, 8.0))), Color(0.5, 0.0, 0.02))
+		# Moscas em volta da carne.
+		for f in 3:
+			var fp := hook + Vector2(sin(t * (7.0 + f) + i * 2.0 + f) * 9.0, 18.0 + cos(t * (5.3 + f) + i) * 12.0) * s
+			o.draw_rect(Rect2(fp.round(), Vector2(1, 1)), Color(0.02, 0.02, 0.02))
+	# Vapor do panelão.
+	var pot := p.proj(Vector3(-0.6, 1.25, 7.25))
+	for i in 10:
+		var k := fmod(t * 0.25 + i * 0.1, 1.0)
+		var sp := pot + Vector2(sin(t + i * 1.7) * 6.0 * k, -k * 60.0)
+		o.draw_circle(sp, 2.0 + k * 7.0, Color(0.8, 0.78, 0.75, 0.07 * (1.0 - k)))

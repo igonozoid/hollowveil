@@ -4,6 +4,9 @@ extends "res://scripts/house/view.gd"
 var portrait_rect := Rect2()
 var stairs_top := Vector2()
 var figure_t := -1.0
+var pendulum := Vector2()
+var pend_len := 0.0
+var _tick := 0.0
 
 
 func _init() -> void:
@@ -42,6 +45,19 @@ func paint() -> void:
 	p.poly3([Vector3(-1.2, 2.4, 9.48), Vector3(-2.4, 2.4, 9.48), Vector3(-2.4, 4.2, 9.48), Vector3(-1.2, 4.2, 9.48)], Color(0.01, 0.01, 0.01), false)
 	p.poly3([Vector3(1.2, 2.4, 9.48), Vector3(2.4, 2.4, 9.48), Vector3(2.4, 4.2, 9.48), Vector3(1.2, 4.2, 9.48)], Color(0.01, 0.01, 0.01), false)
 	_stairs(wood)
+	# Relógio de pé encostado na parede esquerda.
+	var cw := Color(0.22, 0.11, 0.06)
+	p.box(-3.95, -3.35, 0.0, 2.5, 6.4, 6.9, cw, cw.lightened(0.1), cw.darkened(0.2))
+	p.box(-4.0, -3.3, 2.5, 2.62, 6.35, 6.95, cw.lightened(0.15))
+	var face := p.proj(Vector3(-3.65, 2.1, 6.4))
+	var fr := 0.22 * p.scale_at(6.4)
+	draw_circle(face, fr, p.shade(Color(0.8, 0.74, 0.6), Vector3(-3.65, 2.1, 6.4)))
+	draw_arc(face, fr, 0, TAU, 16, Color(0.5, 0.38, 0.18), 1.0)
+	draw_line(face, face + Vector2(0, -fr * 0.75), Color(0.1, 0.05, 0.03), 1.0)
+	draw_line(face, face + Vector2(fr * 0.5, fr * 0.2), Color(0.1, 0.05, 0.03), 1.0)
+	p.poly3([Vector3(-3.8, 0.5, 6.39), Vector3(-3.5, 0.5, 6.39), Vector3(-3.5, 1.7, 6.39), Vector3(-3.8, 1.7, 6.39)], Color(0.05, 0.03, 0.02), false)
+	pendulum = p.proj(Vector3(-3.65, 1.65, 6.38))
+	pend_len = 0.95 * p.scale_at(6.4)
 	# Portas laterais
 	var lib_open := State.has("chave_osso")
 	var dining := p.door_side(-4, 4.2, 1.3, 2.4, wood, false)
@@ -99,7 +115,21 @@ func _board_marks(r: Rect2) -> void:
 		draw_rect(Rect2(c + Vector2(-10 + i * 2.5, -1), Vector2(1, 1)), Color(0.15, 0.1, 0.05))
 
 
+func _process(delta: float) -> void:
+	super(delta)
+	_tick += delta
+	if _tick >= 1.0:
+		_tick -= 1.0
+		Audio.play("tick", -16.0, 0.8)
+
+
 func paint_live(o: Node2D) -> void:
+	# Pêndulo do relógio de pé.
+	if pend_len > 0.0:
+		var ang := sin(t * PI) * 0.22
+		var bob := pendulum + Vector2(sin(ang), cos(ang)) * pend_len
+		o.draw_line(pendulum, bob, Color(0.55, 0.42, 0.2), 1.0)
+		o.draw_circle(bob, maxf(1.5, pend_len * 0.12), Color(0.7, 0.55, 0.25))
 	# Os olhos do retrato seguem o cursor.
 	if portrait_rect.size.x <= 0.0:
 		return

@@ -4,6 +4,7 @@ extends "res://scripts/house/view.gd"
 
 var piano_rect := Rect2()
 var keys_rect := Rect2()
+var beam := PackedVector2Array()
 
 
 func _init() -> void:
@@ -27,6 +28,8 @@ func paint() -> void:
 	p.floor_plane(-1.4, 1.4, 2.5, 6.5, 0.005, Color(0.14, 0.18, 0.22), Color(0.1, 0.12, 0.16), "tiles", 10)
 	# Janela alta no fundo
 	glass.append(p.window_back(0, 8.98, 1.6, 1.0, 3.0, wood.darkened(0.2), SKY_TOP, SKY_BOT))
+	# Raio de luar que entra pela janela e deita no chão.
+	beam = PackedVector2Array([p.proj(Vector3(-0.8, 4.0, 8.98)), p.proj(Vector3(0.8, 4.0, 8.98)), p.proj(Vector3(1.0, 0.0, 5.6)), p.proj(Vector3(-0.6, 0.0, 5.0))])
 	# Estantes nas duas paredes
 	p.bookcase_side(-3.5, 0.5, 8.9, 4.2, wood, 11)
 	p.bookcase_side(3.5, 0.5, 4.2, 4.2, wood, 23)
@@ -69,6 +72,18 @@ func paint() -> void:
 		hot(atlas.grow(8), "puzzle", "puzzle:atlas", "O atlas anatômico")
 		hot(piano_rect, "look", "look:piano", "Piano de estudo")
 	hot_back("go:foyer", "Voltar ao saguão")
+
+
+func paint_live(o: Node2D) -> void:
+	if beam.size() == 4:
+		var a := 0.05 + 0.015 * sin(t * 0.7)
+		o.draw_colored_polygon(beam, Color(0.6, 0.7, 1.0, a))
+		for i in 24:
+			var k := fmod(i * 0.173 + t * 0.02 * (1 + i % 3), 1.0)
+			var top := beam[0].lerp(beam[1], fmod(i * 0.37, 1.0))
+			var bottom := beam[3].lerp(beam[2], fmod(i * 0.37, 1.0))
+			var pos := top.lerp(bottom, k) + Vector2(sin(t * 0.5 + i) * 3.0, 0)
+			o.draw_rect(Rect2(pos.round(), Vector2(1, 1)), Color(0.85, 0.9, 1.0, 0.55 * sin(k * PI)))
 
 
 func _keys() -> void:

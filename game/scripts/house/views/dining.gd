@@ -112,3 +112,9 @@ func paint_live(o: Node2D) -> void:
 			var h := fire_rect.size.y * (0.35 + 0.3 * absf(sin(t * (5.0 + i) + i)))
 			o.draw_colored_polygon(PackedVector2Array([Vector2(x - 3, base.y), Vector2(x, base.y - h), Vector2(x + 3, base.y)]), Color(1.0, 0.45 + 0.1 * sin(t * 9.0 + i), 0.12))
 		o.draw_rect(Rect2(base + Vector2(fire_rect.size.x * 0.1, -3), Vector2(fire_rect.size.x * 0.8, 3)), Color(1.0, 0.85, 0.4))
+		# Brasas subindo pela chaminé.
+		for i in 14:
+			var k := fmod(t * (0.35 + (i % 4) * 0.08) + i * 0.137, 1.0)
+			var ex := base.x + fire_rect.size.x * (0.2 + fmod(i * 0.29, 0.6)) + sin(t * 3.0 + i) * 3.0
+			var ey := base.y - k * fire_rect.size.y * 2.2
+			o.draw_rect(Rect2(ex, ey, 1, 1), Color(1.0, 0.6 - k * 0.3, 0.15, 1.0 - k))

@@ -21,6 +21,7 @@ var lights_node := Node2D.new()
 var t := 0.0
 var flash := 0.0
 var _flames: Array = []
+var _spots: Array = []
 
 
 func _ready() -> void:
@@ -41,6 +42,7 @@ func _draw() -> void:
 	glass.clear()
 	paint()
 	_flames = p.flames.duplicate()
+	_spots = p.spots.duplicate()
 	_spawn_lights.call_deferred(p.spots.duplicate())
 
 
@@ -67,7 +69,43 @@ func _draw_overlay() -> void:
 	if flash > 0.02:
 		for g in glass:
 			overlay.draw_colored_polygon(g, Color(0.85, 0.9, 1.0, flash * 0.9))
+	_rain_on_glass()
 	paint_live(overlay)
+	_dust()
+
+
+## Gotas escorrendo pelo vidro das janelas.
+func _rain_on_glass() -> void:
+	for g: PackedVector2Array in glass:
+		var r := Rect2(g[0], Vector2.ZERO)
+		for v in g:
+			r = r.expand(v)
+		r = r.grow(-2.0)
+		if r.size.x <= 2.0 or r.size.y <= 2.0:
+			continue
+		var n := int(clampf(r.size.x * r.size.y / 300.0, 3.0, 18.0))
+		for k in n:
+			var x := r.position.x + fmod(k * 37.13 + r.position.x, r.size.x)
+			var y := r.position.y + fmod(t * (18.0 + (k % 5) * 9.0) + k * 53.7, r.size.y)
+			overlay.draw_rect(Rect2(x, y, 1, 2 + k % 3), Color(0.75, 0.85, 1.0, 0.28))
+
+
+## Poeira suspensa: só aparece onde há luz por perto.
+func _dust() -> void:
+	if not State.effects:
+		return
+	for i in 70:
+		var x := fmod(i * 97.31 + sin(t * 0.31 + i) * 14.0 + t * (1.5 + i % 3), 640.0)
+		var y := fmod(i * 53.77 + t * (2.0 + (i % 4) * 0.8), 360.0)
+		var pos := Vector2(x, y)
+		var b := 0.0
+		for s in _spots:
+			var r: float = s[2] * 1.3
+			var d: float = pos.distance_to(s[0])
+			if d < r:
+				b = maxf(b, (1.0 - d / r) * float(s[3]))
+		if b > 0.06:
+			overlay.draw_rect(Rect2(pos.round(), Vector2(1, 1)), Color(1.0, 0.86, 0.62, minf(b, 1.0) * 0.7))
 
 
 ## Sobrescrever: desenho estático do cômodo.

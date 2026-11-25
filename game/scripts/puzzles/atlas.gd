@@ -164,11 +164,11 @@ func _process(delta: float) -> void:
 		win_t += delta
 		eyes_open = minf(1.0, win_t / 0.8)
 		if win_t > 0.9 and win_t < 2.0 and randf() < 0.3:
-			for e in [Vector2(76, 86), Vector2(118, 86)]:
+			for e in [Vector2(54, 87), Vector2(117, 87)]:
 				blood.drip(ORIGIN + e + Vector2(randf_range(-2, 2), 4), 70.0)
 		if win_t > 0.9 and win_t - delta <= 0.9:
 			Audio.play("squelch", -4.0, 0.8)
-			blood.spray(ORIGIN + Vector2(118, 86), Vector2(1, -0.4), 30, 120.0, 0.5)
+			blood.spray(ORIGIN + Vector2(117, 87), Vector2(1, -0.4), 30, 120.0, 0.5)
 	art.queue_redraw()
 
 
@@ -208,9 +208,25 @@ func _paint_art() -> void:
 	var a := art
 	var paper := Color(0.78, 0.7, 0.54)
 	a.draw_rect(Rect2(0, 0, 192, 192), paper)
+	# Hachura de gravura e manchas de umidade: nenhuma peça fica lisa.
+	for i in range(-192, 192, 5):
+		a.draw_line(Vector2(i, 0), Vector2(i + 192, 192), Color(0.64, 0.55, 0.38, 0.22), 1.0)
 	for i in 30:
 		var p := Vector2(fmod(i * 61.7, 192.0), fmod(i * 37.3, 192.0))
-		a.draw_circle(p, 2 + i % 4, Color(0.7, 0.6, 0.42, 0.5))
+		a.draw_circle(p, 2 + i % 4, Color(0.62, 0.5, 0.32, 0.35))
+	for i in 3:
+		a.draw_circle(Vector2(30 + i * 70, 170 - i * 60), 14 + i * 4, Color(0.55, 0.42, 0.25, 0.12))
+	# Moldura gravada, régua na margem e numeração.
+	a.draw_rect(Rect2(3, 3, 186, 186), Color(0.3, 0.18, 0.1), false, 1.0)
+	a.draw_rect(Rect2(6, 6, 180, 180), Color(0.3, 0.18, 0.1, 0.5), false, 1.0)
+	for i in 36:
+		a.draw_line(Vector2(6, 8 + i * 5), Vector2(9 if i % 5 else 12, 8 + i * 5), Color(0.3, 0.18, 0.1), 1.0)
+	_label(a, Vector2(150, 16), "XIII")
+	_legend(a)
+	# O rosto ocupa a prancha toda (escala em volta do centro).
+	var zoom := 1.48
+	var c0 := Vector2(84, 108)
+	a.draw_set_transform(c0 - Vector2(96, 100) * zoom, 0.0, Vector2(zoom, zoom))
 	var c := Vector2(96, 100)
 	var skin := Color(0.86, 0.72, 0.6)
 	var skin_d := Color(0.68, 0.52, 0.42)
@@ -279,10 +295,25 @@ func _paint_art() -> void:
 		a.draw_rect(Rect2(97 + i * 3.5, 129, 3, 4), bone)
 	# Orelha esquerda
 	a.draw_colored_polygon(PackedVector2Array([Vector2(55, 84), Vector2(48, 90), Vector2(50, 106), Vector2(56, 104)]), skin_d)
-	# Linhas de anotação e letras
-	for k in 4:
-		var from: Vector2 = [Vector2(120, 62), Vector2(126, 86), Vector2(110, 128), Vector2(108, 160)][k]
-		var to := Vector2(170, 40 + k * 34)
-		a.draw_line(from, to, ink, 1.0)
-		a.draw_string(ThemeDB.fallback_font, to + Vector2(3, 3), "abcd"[k], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, ink)
-	a.draw_string(ThemeDB.fallback_font, Vector2(8, 184), "E. M. fecit", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, ink)
+	a.draw_set_transform(Vector2.ZERO)
+	# Linhas de anotação ligando o rosto às letras da margem.
+	var pts := [Vector2(120, 62), Vector2(126, 86), Vector2(110, 128), Vector2(108, 160), Vector2(64, 80), Vector2(70, 124)]
+	for k in pts.size():
+		var from: Vector2 = c0 + ((pts[k] as Vector2) - c) * zoom
+		var to := Vector2(176, 30 + k * 26) if k < 4 else Vector2(176, 30 + k * 26)
+		a.draw_line(from, to, Color(0.2, 0.12, 0.08, 0.8), 1.0)
+		a.draw_circle(from, 1.5, ink)
+		_label(a, to + Vector2(2, 3), "abcdef"[k])
+	_label(a, Vector2(12, 184), "E. M. fecit 1909")
+
+
+func _label(a: Node2D, at: Vector2, text: String) -> void:
+	a.draw_string(ThemeDB.fallback_font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color(0.2, 0.12, 0.08))
+
+
+## Legenda em latim no canto: dá textura às peças de baixo.
+func _legend(a: Node2D) -> void:
+	var lines := ["a. os parietale", "b. bulbus oculi", "c. dentes", "d. m. sternocl.", "e. palpebra", "f. labium"]
+	for i in lines.size():
+		_label(a, Vector2(140, 128 + i * 9), lines[i])
+	a.draw_line(Vector2(138, 122), Vector2(186, 122), Color(0.3, 0.18, 0.1), 1.0)
