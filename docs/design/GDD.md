@@ -2,7 +2,7 @@
 
 **Gênero:** aventura de horror com enigmas, em primeira pessoa, com cenas fantasmas encenadas em vista lateral.
 **Motor:** Godot 4.7, GDScript, renderizador Compatibility, sem nenhuma imagem ou som externo.
-**Assinatura visual:** a do IronVeil, ou seja, 640×360 ampliado em pixel nítido, luz 2D dinâmica, pós-processamento por ato e tudo desenhado por código.
+**Assinatura visual:** a do IronVeil, ou seja, 640×360 ampliado em pixel nítido, luz 2D dinâmica, pós-processamento por andar e tudo desenhado por código.
 **Duração-alvo:** de 6 a 8 horas na primeira volta, com mais 3 a 4 horas na "Noite Mais Escura" (NG+).
 
 ---
@@ -36,14 +36,22 @@ Aos poucos, as cenas mostram o plano de Morvant. Ele tirou de cada pessoa uma pa
 | Ofélia Morvant | Filha de 19 anos, médium de verdade | O "dom" | Quarto de Ofélia |
 | Dr. Ezequiel Morvant | O anfitrião | — | O Teatro Anatômico |
 
-## 3. Estrutura
+## 3. Estrutura: uma casa contínua
 
-| Ato | Zona | Cômodos | Enigmas | Cenas fantasmas |
+Não há atos, capítulos nem telas de carregamento. O jogo é uma só casa, que se abre aos poucos e muda enquanto o jogador anda por ela. O que marca o avanço é a própria casa: portas que destrancam, cômodos que mudam depois de cada alma libertada e a voz de Morvant comentando.
+
+- **Liberdade dentro do que está aberto.** Em cada andar liberado, os cômodos podem ser resolvidos em qualquer ordem, como no The 7th Guest. Uma porta só exige um enigma anterior quando a história pede (a chave de osso abre a biblioteca, por exemplo).
+- **Andares abrem por almas libertadas**, não por fases concluídas:
+
+| Andar | Cômodos | Enigmas | Cenas fantasmas | Abre quando |
 |---|---|---|---|---|
-| **I — O Térreo** | Térreo | Saguão, Sala de jantar, Biblioteca, Cozinha, Sala de música, Estufa | 6 | 4 |
-| **II — Os Quartos** | 1º andar | Corredor, quartos de Celeste, Ofélia e dos hóspedes, Banheiro, Berçário vazio | 7 | 3 |
-| **III — Os Porões** | Subsolo | Adega, Câmara fria, Capela, Cripta, Labirinto das fundações | 6 | 3 |
-| **IV — O Véu** | Sótão e torre | Sótão, Teatro Anatômico, Torre do relógio | 5 | 2 + finais |
+| Térreo | Saguão, Sala de jantar, Biblioteca, Cozinha, Sala de música, Estufa | 6 | 4 | Desde o início |
+| 1º andar | Corredor, quartos de Celeste, Ofélia e dos hóspedes, Banheiro, Berçário vazio | 7 | 3 | 3 almas (a escada de serviço) |
+| Porões | Adega, Câmara fria, Capela, Cripta, Labirinto das fundações | 6 | 3 | 6 almas (o alçapão da cozinha) |
+| Sótão e torre | Sótão, Teatro Anatômico, Torre do relógio | 5 | 2 + finais | 7 almas (a escadaria principal destrava) |
+
+- **Voltar sempre vale a pena.** Andares já abertos continuam acessíveis e mudam com o progresso: sangue novo, objetos fora do lugar, sustos novos e relíquias que só aparecem depois.
+- **Cada andar tem clima próprio** (paleta, trilha e gradação de cor), que muda com uma transição suave na escada, sem corte.
 
 O **Saguão** é o centro de tudo: a escadaria, o retrato de Morvant (cujos olhos seguem o cursor) e a **Prancheta**, um tabuleiro de mesa girante que dá pistas.
 
@@ -79,7 +87,7 @@ O **Saguão** é o centro de tudo: a escadaria, o retrato de Morvant (cujos olho
   - O sangue é a única coisa sólida e em cor plena: vermelho vivo que espirra, escorre e fica no chão da cena.
   - Gore pode ser desligado no menu.
 
-## 6. Enigmas do Ato I (fatia vertical em negrito)
+## 6. Enigmas do térreo (os da fatia vertical em negrito)
 
 | Cômodo | Enigma | Mecânica | Semente gera |
 |---|---|---|---|
@@ -90,22 +98,22 @@ O **Saguão** é o centro de tudo: a escadaria, o retrato de Morvant (cujos olho
 | Estufa | As Veias | Variação de "apague as luzes" com raízes que pulsam | Estado inicial |
 | Saguão | A Prancheta | Cifra de letras com o alfabeto da mesa girante | Mensagem e chave |
 
-Atos seguintes (rascunho): pesos e órgãos em balança, labirinto em primeira pessoa nas fundações, peças de xadrez com bisturis, caixas de música com engrenagens, transvaso de sangue entre frascos, ganchos de carne num quebra-cabeça de empurrar caixas na câmara fria e a montagem final do corpo no Teatro Anatômico.
+Demais andares (rascunho): pesos e órgãos em balança, labirinto em primeira pessoa nas fundações, peças de xadrez com bisturis, caixas de música com engrenagens, transvaso de sangue entre frascos, ganchos de carne num quebra-cabeça de empurrar caixas na câmara fria e a montagem final do corpo no Teatro Anatômico.
 
 ## 7. Arte
 
 - **Resolução:** 640×360 ampliado sem suavização. As cores são chapadas, com sombreamento em faixas, porque os planos são divididos em fatias que escurecem com a distância.
 - **Perspectiva:** os cômodos são caixas 3D projetadas por código. Piso de tábuas ou ladrilho, papel de parede adamascado, lambri, vigas, portas, janelas com luar, estantes, retratos e lustres.
 - **Luz:** `CanvasModulate` escuro mais `PointLight2D` em cada vela, janela e lareira, com tremulação. Os relâmpagos da trilha de ambiente acendem as janelas.
-- **Pós-processamento:** brilho, gradação de sombras e realces por ato, contraste, vinheta e grão. Há também um **Modo VGA** opcional, com pontilhado ordenado e paleta reduzida, e a **distorção da sanidade** (ondulação e aberração cromática).
-- **Paleta por ato:**
+- **Pós-processamento:** brilho, gradação de sombras e realces por andar, contraste, vinheta e grão. Há também um **Modo VGA** opcional, com pontilhado ordenado e paleta reduzida, e a **distorção da sanidade** (ondulação e aberração cromática).
+- **Paleta por andar:**
 
-| Ato | Sombras | Luz | Acento |
+| Andar | Sombras | Luz | Acento |
 |---|---|---|---|
-| I — Térreo | Verde-musgo | Vela âmbar | Vinho |
-| II — Quartos | Roxo | Lilás | Rosa podre |
-| III — Porões | Azul-negro | Lanterna | Vermelho |
-| IV — O Véu | Quase preto | Branco frio | Sangue |
+| Térreo | Verde-musgo | Vela âmbar | Vinho |
+| 1º andar | Roxo | Lilás | Rosa podre |
+| Porões | Azul-negro | Lanterna | Vermelho |
+| Sótão e torre | Quase preto | Branco frio | Sangue |
 
 - **Interface:** painéis marrom-escuros com borda de latão, como no IronVeil, e a vela da sanidade. As legendas usam o nome de quem fala em latão.
 

@@ -1,5 +1,5 @@
 extends Node2D
-## Fim da fatia vertical: resumo da noite e chamada para o Ato II.
+## Fim da fatia vertical: resumo da investigação e o que vem depois da escada.
 
 signal done
 
@@ -21,7 +21,7 @@ func _ready() -> void:
 		if String(k).begins_with("host_solved_"):
 			host += 1
 	var mins := int(State.play_time / 60.0)
-	label.text = "FIM DA PRIMEIRA NOITE\n\nTrês almas libertadas. Cinco ainda esperam lá em cima.\n\nTempo: %d min   ·   Sanidade: %d%%   ·   Pistas: %d   ·   Resolvidos por Morvant: %d\n\n\nATO II — OS QUARTOS\nem construção\n\n\nclique para voltar ao menu" % [mins, int(State.sanity), hints, host]
+	label.text = "A ESCADA DE SERVIÇO\n\nTrês almas libertadas. Cinco ainda esperam lá em cima.\n\nTempo: %d min   ·   Sanidade: %d%%   ·   Pistas: %d   ·   Resolvidos por Morvant: %d\n\n\nO 1º ANDAR AINDA ESTÁ SENDO CONSTRUÍDO\nfim da demonstração\n\n\nclique para voltar ao menu" % [mins, int(State.sanity), hints, host]
 	add_child(label)
 	Audio.music("menu")
 

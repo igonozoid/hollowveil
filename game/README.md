@@ -2,7 +2,7 @@
 
 Horror em primeira pessoa com enigmas e cenas fantasmas em vista lateral. Godot 4.7, só GDScript, sem nenhuma imagem ou som externo: os cômodos, os personagens, o sangue, a trilha e os efeitos são gerados por código. O design completo está em [../docs/design/GDD.md](../docs/design/GDD.md).
 
-Esta versão é a **fatia vertical do Ato I**: saguão, sala de jantar, biblioteca e cozinha, com três enigmas (A Ceia, O Atlas e Olhos no Pote), três cenas de morte, a Prancheta de pistas, sanidade e salvamento automático.
+Esta versão é a **fatia vertical do térreo**: saguão, sala de jantar, biblioteca e cozinha, com três enigmas (A Ceia, O Atlas e Olhos no Pote), três cenas de morte, a Prancheta de pistas, sanidade e salvamento automático.
 
 ## Jogar
 
