@@ -79,6 +79,20 @@ Com `-- --qa`, o jogo não grava o save e aceita atalhos de teste:
 | F7 | Diminui a sanidade |
 | F8 | Aumenta a sanidade |
 
+## Walkthrough e itch.io
+
+- O guia completo, com spoilers, está em [../docs/WALKTHROUGH.md](../docs/WALKTHROUGH.md).
+- O texto da página do itch.io está em [../docs/itch/PAGINA.md](../docs/itch/PAGINA.md).
+- Para gerar as versões e enviá-las (precisa dos modelos de exportação do Godot 4.7.2 e do `butler`):
+
+```bash
+tools/itch/build.sh
+```
+
+```bash
+tools/itch/push.sh usuario/hollowveil 1.0.0
+```
+
 ## Ferramentas
 
 | Script | Para que serve |

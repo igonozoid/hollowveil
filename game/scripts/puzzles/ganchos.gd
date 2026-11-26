@@ -39,7 +39,15 @@ func build() -> void:
 	else:
 		var sd := State.puzzle_seed("ganchos")
 		dark = State.dark_night
-		_task = WorkerThreadPool.add_task(_gen_task.bind(sd))
+		if OS.has_feature("threads"):
+			_task = WorkerThreadPool.add_task(_gen_task.bind(sd))
+		else:
+			# Sem threads: gera depois do primeiro quadro, com o aviso na tela.
+			(func():
+				await get_tree().process_frame
+				await get_tree().process_frame
+				_gen_task(sd)
+				_room_ready()).call()
 	undo_btn.text = "Desfazer"
 	undo_btn.position = Vector2(230, 334)
 	undo_btn.size = Vector2(84, 20)

@@ -9,7 +9,8 @@ const Synth := preload("res://scripts/audio/synth.gd")
 const BAKED := "res://music/%s.wav"
 const SFX_NAMES := ["step", "step2", "door", "creak", "locked", "slam", "squelch", "splat",
 	"pop", "heart", "whisper", "sting", "thunder", "tile", "card", "saw", "cough", "scream",
-	"laugh", "solved", "wrong", "candle", "planchette", "crunch", "hover", "tick", "wind"]
+	"laugh", "solved", "wrong", "candle", "planchette", "crunch", "hover", "tick", "wind",
+	"drip", "bell", "ice", "cry"]
 
 var _sfx: Dictionary = {}
 var _tracks: Dictionary = {}
@@ -26,6 +27,8 @@ var ambient_on := false
 var _creak_t := 6.0
 var _thunder_t := 14.0
 var _tasks: Array = []
+## Sem threads (versão para navegador): os efeitos são gerados um por quadro.
+var _sfx_backlog: Array = []
 
 
 func _ready() -> void:
@@ -45,7 +48,13 @@ func _ready() -> void:
 	State.settings_changed.connect(apply_volumes)
 	if DisplayServer.get_name() == "headless":
 		return
-	_tasks.append(WorkerThreadPool.add_task(_build_sfx))
+	if OS.has_feature("threads"):
+		_tasks.append(WorkerThreadPool.add_task(_build_sfx))
+	else:
+		_sfx_backlog = SFX_NAMES.duplicate()
+		# O vento primeiro, para o ambiente começar logo.
+		_sfx_backlog.erase("wind")
+		_sfx_backlog.push_front("wind")
 
 
 func _make_player(bus: String) -> AudioStreamPlayer:
@@ -76,6 +85,9 @@ func _render_track(id: String) -> void:
 
 
 func _process(delta: float) -> void:
+	if not _sfx_backlog.is_empty():
+		var n: String = _sfx_backlog.pop_front()
+		_ready_queue.append(["sfx", n, Synth.make(n)])
 	_mutex.lock()
 	var q := _ready_queue.duplicate()
 	_ready_queue.clear()
@@ -125,7 +137,7 @@ func music(id: String) -> void:
 		_tracks[id] = load(BAKED % id)
 	if _tracks.has(id):
 		_switch(id)
-	elif not _pending.has(id) and DisplayServer.get_name() != "headless":
+	elif not _pending.has(id) and DisplayServer.get_name() != "headless" and OS.has_feature("threads"):
 		_pending[id] = true
 		_tasks.append(WorkerThreadPool.add_task(_render_track.bind(id)))
 
@@ -137,7 +149,7 @@ func warm(ids: Array) -> void:
 	for id in ids:
 		if not _tracks.has(id) and ResourceLoader.exists(BAKED % id):
 			_tracks[id] = load(BAKED % id)
-		if not _tracks.has(id) and not _pending.has(id):
+		if not _tracks.has(id) and not _pending.has(id) and OS.has_feature("threads"):
 			_pending[id] = true
 			_tasks.append(WorkerThreadPool.add_task(_render_track.bind(id)))
 
