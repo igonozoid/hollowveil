@@ -270,6 +270,54 @@ func _run() -> void:
 			lab_ok = lab_ok and lb.move(d) and lb.caught_t == 0.0
 		lab_ok = lab_ok and lb.done
 		lb.free()
+	var Bau = load("res://scripts/puzzles/bau.gd")
+	var Luar = load("res://scripts/puzzles/luar.gd")
+	var bau_ok := true
+	var bau_worst := 0
+	var luar_ok := true
+	for s in 60:
+		State.seed_value = s * 2741 + 17
+		State.drafts = {}
+		var bz = Bau.new()
+		bz.rng.seed = State.puzzle_seed("bau")
+		bz.new_code()
+		# Estratégia simples: sempre tentar um código coerente com as respostas.
+		var all: Array = []
+		for a in 6:
+			for b in 6:
+				for c in 6:
+					for d in 6:
+						if a != b and a != c and a != d and b != c and b != d and c != d:
+							all.append([a, b, c, d])
+		var tries := 0
+		var cand: Array = all
+		while true:
+			var g: Array = cand[0]
+			tries += 1
+			var sc: Vector2i = Bau.score(g, bz.code)
+			if sc.x == 4 or tries > 8:
+				break
+			var keep: Array = []
+			for c2 in cand:
+				if Bau.score(g, c2) == sc:
+					keep.append(c2)
+			cand = keep
+		bau_ok = bau_ok and tries <= 8
+		bau_worst = maxi(bau_worst, tries)
+		bz.free()
+		var lu = Luar.new()
+		var rng7 := RandomNumberGenerator.new()
+		rng7.seed = State.puzzle_seed("luar")
+		lu.generate(rng7)
+		lu.placed = {}
+		lu.trace()
+		var blind: bool = not lu.hit
+		lu.placed = lu.solution.duplicate()
+		lu.trace()
+		luar_ok = luar_ok and blind and lu.hit and lu.stock == lu.solution.size() and lu.stock >= 3
+		lu.free()
+	check(bau_ok, "O Baú: tentar sempre um código coerente abre o cadeado em até 8 tentativas (pior caso: %d)" % bau_worst)
+	check(luar_ok, "O Luar: sem espelhos a lua não chega ao olho; os espelhos da semente chegam, em 60 sementes")
 	check(oss_ok, "O Ossuário: toda figura se resolve só por linha e coluna (solução única), em 60 sementes")
 	check(lab_ok, "O Labirinto: o caminho mais curto chega à saída sem a coisa alcançar Dália (mínimo de %d passos)" % lab_min)
 	check(gan_ok, "Os Ganchos: a busca para trás acerta o mínimo de empurrões, em 16 sementes (mínimo %d)" % gan_min)
@@ -586,7 +634,55 @@ func _run() -> void:
 			attic = true
 	check(attic, "A escadaria sobe ao sótão")
 
-	# 11. Salvar e carregar.
+	# 11. Sótão: baú → memória → chave; torre → luar; porta do teatro.
+	h.subs.clear()
+	h._event("attic")
+	await w(2.4)
+	check(h.view.id == "attic" and h.view.grade == "sotao", "Chega ao sótão")
+	var th_locked := false
+	for hs in h.view.hotspots:
+		if hs["action"] == "locked:theater":
+			th_locked = true
+	check(th_locked, "A porta do teatro começa trancada")
+	h.subs.clear()
+	h.open_puzzle("bau")
+	await w(0.3)
+	h.puzzle.try_guess(h.puzzle.code)
+	while h.stage == null:
+		await w(0.1)
+	check(h.stage.script_id == "bau", "O Baú leva à memória da costura")
+	h.stage.skip()
+	while h.mode != "explore":
+		await w(0.1)
+	check(State.has("chave_teatro"), "O baú guarda a chave do teatro")
+	h.subs.clear()
+	h.go("clock_tower")
+	await w(2.4)
+	check(h.view.id == "clock_tower", "Chega à torre do relógio")
+	h.subs.clear()
+	h.open_puzzle("luar")
+	await w(0.3)
+	var lp = h.puzzle
+	var sol: Dictionary = lp.solution
+	var cells: Array = sol.keys()
+	for i in cells.size():
+		var c3: Vector2i = cells[i]
+		lp.toggle(c3)
+		if sol[c3] == "\\":
+			lp.toggle(c3)
+	while h.puzzle != null or h.mode != "explore":
+		await w(0.1)
+	check(State.flag("luar"), "O Luar acende o olho da porta do teatro")
+	h.subs.clear()
+	h.go("attic")
+	await w(2.4)
+	var th_open := false
+	for hs in h.view.hotspots:
+		if hs["action"] == "event:theater":
+			th_open = true
+	check(th_open, "Com a chave e o luar, a porta do teatro abre")
+
+	# 12. Salvar e carregar.
 	State.qa = false
 	State.save_game()
 	var before := State.solved.duplicate()

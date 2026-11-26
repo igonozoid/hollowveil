@@ -345,6 +345,9 @@ func _draw_actor(a: Actor) -> void:
 			# Uma trouxinha de linho branco, pequena demais.
 			draw_circle(hand + dir * 2.0, 4.0, Color(0.88, 0.86, 0.8))
 			draw_rect(Rect2(hand + dir * 2.0 + Vector2(-5, -2), Vector2(9, 5)), Color(0.88, 0.86, 0.8))
+		"agulha":
+			draw_line(hand, hand + dir * 6.0, Color(0.85, 0.87, 0.9), 1.0)
+			draw_line(hand + dir * 6.0, hand + dir * 6.0 + Vector2(0, 10), Color(0.05, 0.05, 0.05), 1.0)
 		"lamparina":
 			draw_line(hand, hand + Vector2(0, 6), Color(0.3, 0.28, 0.26), 1.0)
 			draw_rect(Rect2(hand + Vector2(-2, 6), Vector2(4, 5)), Color(1.0, 0.75, 0.35))
@@ -655,6 +658,48 @@ func _props_ossuario() -> void:
 	for x in [40, 520]:
 		draw_rect(Rect2(x, 236, 90, 40), Color(0.4, 0.39, 0.37))
 		draw_rect(Rect2(x - 4, 230, 98, 7), Color(0.55, 0.54, 0.5))
+
+
+func _props_bau() -> void:
+	# Oficina sob o telhado: caibros, prateleiras de vidros, a mesa de costura.
+	for i in 20:
+		draw_rect(Rect2(0, i * 14, 640, 15), Color(0.12, 0.1, 0.09).lerp(Color(0.05, 0.045, 0.045), i / 19.0))
+	for k in 7:
+		var x := 40.0 + k * 96.0
+		draw_line(Vector2(x, 0), Vector2(x + 60, 236), Color(0.08, 0.05, 0.035), 4.0)
+	draw_rect(Rect2(0, FLOOR, 640, 100), Color(0.07, 0.05, 0.035))
+	for i in 6:
+		draw_line(Vector2(0, FLOOR + i * i * 3), Vector2(640, FLOOR + i * i * 3), Color(0.1, 0.07, 0.05), 1.0)
+	# Prateleira de vidros: olhos, mãos, um vidro com a voz (uma névoa que vibra).
+	draw_rect(Rect2(60, 120, 200, 4), Color(0.3, 0.2, 0.12))
+	for k in 6:
+		var jx := 72.0 + k * 32.0
+		draw_rect(Rect2(jx, 92, 20, 28), Color(0.45, 0.52, 0.4, 0.7))
+		if k == 2:
+			draw_circle(Vector2(jx + 10, 106), 6 + sin(t * 9.0), Color(0.75, 0.95, 0.9, 0.5))
+		elif k % 2 == 0:
+			draw_circle(Vector2(jx + 7, 108), 3, Color(0.9, 0.88, 0.82))
+			draw_circle(Vector2(jx + 13, 104), 3, Color(0.9, 0.88, 0.82))
+		else:
+			draw_rect(Rect2(jx + 5, 100, 10, 14), Color(0.7, 0.6, 0.55))
+	# A mesa e o corpinho costurado, coberto até o peito.
+	draw_rect(Rect2(300, 230, 180, 7), Color(0.32, 0.22, 0.14))
+	for x in [308, 468]:
+		draw_rect(Rect2(x, 237, 5, 39), Color(0.26, 0.17, 0.1))
+	draw_rect(Rect2(330, 222, 120, 8), Color(0.82, 0.8, 0.74))
+	draw_circle(Vector2(330, 222), 7, Color(0.78, 0.7, 0.66))
+	# Costuras pretas, e mãos grandes demais para um bebê.
+	draw_line(Vector2(336, 219), Vector2(352, 219), Color(0.05, 0.05, 0.05), 1.0)
+	for k in 6:
+		draw_line(Vector2(338 + k * 3, 217), Vector2(338 + k * 3, 221), Color(0.05, 0.05, 0.05), 1.0)
+	draw_rect(Rect2(446, 216, 16, 8), Color(0.75, 0.66, 0.6))
+	if State.gore:
+		draw_rect(Rect2(380, 230, 30, 2), Color(0.5, 0.0, 0.04))
+		for k in 4:
+			draw_rect(Rect2(386 + k * 7, 237, 1, 6 + k * 3), Color(0.5, 0.0, 0.04))
+	# Lamparina de pé.
+	draw_rect(Rect2(486, 214, 6, 16), Color(1.0, 0.75, 0.35))
+	draw_circle(Vector2(489, 220), 14, Color(1.0, 0.75, 0.4, 0.12))
 
 
 # ---------------------------------------------------------------- roteiros
@@ -1306,4 +1351,56 @@ func scene_ossuario() -> void:
 	await _w(4.2)
 	_say("DÁLIA", "E os números desta parede... alguém continuou contando os crânios depois disso.")
 	await _w(3.8)
+	_end()
+
+
+## Memória, não morte: a costura. O corpo de Benjamim, montado com as peças.
+func scene_bau() -> void:
+	prop_draw = _props_bau
+	blood.walls = [Rect2(280, 120, 220, 110)]
+	surfaces = [Rect2(300, 230, 180, 7)]
+	var host := _actor("host", {"x": 300.0, "facing": 1.0, "kind": "host", "arm_f": 1.3, "tool": "agulha"})
+	await _w(1.0)
+	# Ele costura, ponto por ponto, cantarolando com a voz de Celeste.
+	for i in 5:
+		_tw(host, "arm_f", 1.8, 0.25)
+		await _w(0.3)
+		_sfx("squelch", -14.0, 1.8)
+		if State.gore and i % 2 == 0:
+			blood.drip(Vector2(352 + i * 5, 222), 20.0)
+		_tw(host, "arm_f", 1.2, 0.3)
+		await _w(0.4)
+	_sfx("whisper", -6.0, 1.7)
+	_say("MORVANT", "As mãos do pianista, para ele tocar. Os olhos da cozinheira, para ele achar o caminho de casa.")
+	await _w(4.6)
+	_say("MORVANT", "A pele do capitão, que aguenta qualquer frio. A voz da mãe, para chamar por ela.")
+	await _w(4.4)
+	_say("MORVANT", "O coração do padre, que bate mais do que devia. E o dom de Ofélia, para ouvir o caminho de volta.")
+	await _w(4.6)
+	host.tool = ""
+	_tw(host, "arm_f", 0.4, 0.4)
+	await _w(1.0)
+	_say("MORVANT", "Acorde, Benjamim. O papai está aqui.")
+	await _w(3.0)
+	# Nada. Depois, a mão grande demais se mexe.
+	_sfx("heart", -4.0, 1.2)
+	await _w(1.2)
+	_sfx("heart", -2.0, 1.2)
+	_shake(0.3)
+	await _w(0.8)
+	_sfx("cry", -2.0, 0.8)
+	_shake(0.6)
+	flash = 0.25
+	_say("MORVANT", "Ele mexeu. Ele MEXEU! Benjamim? Olhe para o papai...")
+	await _w(3.4)
+	_sfx("scream", -6.0, 0.7)
+	_say("MORVANT", "Não. Não é ele. Os olhos... o que está olhando por esses olhos não é o meu filho.")
+	await _w(4.0)
+	_say("MORVANT", "Falta uma peça. Alguém que escute de verdade, para chamar o menino certo pelo nome.")
+	await _w(4.4)
+	_sfx("laugh", -8.0, 0.8)
+	_tw(host, "alpha", 0.0, 2.0)
+	await _w(2.2)
+	_say("DÁLIA", "A última peça. Uma médium de verdade. Ele não me trouxe aqui para acalmar a casa.")
+	await _w(4.4)
 	_end()

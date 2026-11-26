@@ -23,6 +23,8 @@ const TRACKS := {
 		"voices": ["cluster", "heart", "choir"], "tick": false, "seed": 31},
 	"poroes": {"bpm": 44, "root": 36, "scale": PHRYG, "prog": [0, 1, 0, 5, 0, 1, 6, 0],
 		"voices": ["drone", "chant", "drips"], "tick": false, "seed": 43},
+	"sotao": {"bpm": 40, "root": 41, "scale": LOCRIAN, "prog": [0, 0, 1, 0, 4, 3, 1, 0],
+		"voices": ["drone", "lullaby", "cluster"], "tick": true, "seed": 53},
 }
 
 
@@ -105,6 +107,14 @@ static func render_track(spec: Dictionary) -> PackedFloat32Array:
 						deg = clampi(deg + rng.randi_range(-1, 1), d, d + 5)
 						if rng.randf() < 0.8:
 							_tone(buf, t0 + i * beat + 0.04, beat * 1.05, hz(degree(spec, deg, 1)), 0.05, "choir")
+				"lullaby":
+					# A canção de ninar de Celeste, lenta demais e desafinada, numa caixa que está parando.
+					var mel := [4, 2, 0, 2, 4, 4, 4, -1]
+					var slow := 1.0 + 0.15 * float(bar % 4)
+					for i in 4:
+						var nd: int = mel[(bar * 2 + i) % mel.size()]
+						if nd >= 0 and rng.randf() < 0.85:
+							_tone(buf, t0 + i * beat * slow * 0.9, beat * 2.0, hz(degree(spec, d + nd, 2) + rng.randf_range(-0.5, 0.5)), 0.06, "bell")
 				"drips":
 					for i in rng.randi_range(0, 2):
 						_drop(buf, t0 + rng.randf() * 4.0 * beat, 0.09, rng.randf_range(900.0, 1700.0))

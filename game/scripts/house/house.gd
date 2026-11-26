@@ -23,6 +23,8 @@ const VIEWS := {
 	"cold_room": preload("res://scripts/house/views/cold_room.gd"),
 	"chapel": preload("res://scripts/house/views/chapel.gd"),
 	"crypt": preload("res://scripts/house/views/crypt.gd"),
+	"attic": preload("res://scripts/house/views/attic.gd"),
+	"clock_tower": preload("res://scripts/house/views/clock_tower.gd"),
 }
 const PUZZLES := {
 	"ceia": preload("res://scripts/puzzles/ceia.gd"),
@@ -41,11 +43,13 @@ const PUZZLES := {
 	"vitral": preload("res://scripts/puzzles/vitral.gd"),
 	"ossuario": preload("res://scripts/puzzles/ossuario.gd"),
 	"labirinto": preload("res://scripts/puzzles/labirinto.gd"),
+	"bau": preload("res://scripts/puzzles/bau.gd"),
+	"luar": preload("res://scripts/puzzles/luar.gd"),
 }
 ## Enigmas que libertam uma alma (e têm cena de morte). Os outros só abrem caminho.
 const SOULS := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral"]
 ## Enigmas que levam a uma cena (almas e memórias).
-const SCENES := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral", "movel", "balanca", "ossuario"]
+const SCENES := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral", "movel", "balanca", "ossuario", "bau"]
 const GhostStage := preload("res://scripts/ghosts/ghost_stage.gd")
 const Subtitles := preload("res://scripts/ui/subtitles.gd")
 const Hud := preload("res://scripts/ui/hud.gd")
@@ -85,6 +89,10 @@ const LOOK := {
 	"rose_after": "A rosácea brilha sozinha. A cruz, o peixe, a chave, o cálice, a estrela e o olho, cada um no seu lugar.",
 	"altar_after": "A toalha do altar está encharcada. Atrás dele, a parede parece mais fina.",
 	"small_coffin": "O forro de cetim tem a marca de um corpo do tamanho de um gato. Ainda morno. Na tampa: \"Benjamim, 1910\".",
+	"trunk_after": "O caderno de costura de Morvant. Cada página tem um nome, uma parte do corpo e um desenho de onde a linha entra.",
+	"rocking_horse": "O cavalinho tem o nome Benjamim pintado no pescoço. Nunca foi usado. A tinta da sela está riscada por unhas.",
+	"pendulum": "A lâmina do pêndulo passa a um palmo do meu rosto. Tem uma crosta escura no fio.",
+	"moonbeam_after": "O luar corre pelos espelhos, desce pelo poço da escada e vai acender o olho da porta do teatro.",
 	"ossuary_after": "Os crânios do meio caíram para dentro. Do buraco vem um ar frio e um cheiro de terra molhada.",
 }
 const LOCKED := {
@@ -96,6 +104,7 @@ const LOCKED := {
 	"guest": "Trancada. A fechadura é de latão, com um 3 gravado.",
 	"nursery": "Trancado. Do outro lado, um móbile gira sem vento.",
 	"trapdoor": "Um alçapão no chão, pregado por dentro. Lá embaixo, alguém reza em latim.",
+	"theater": "Trancada. Do outro lado, alguém nina um bebê, e o bebê responde numa voz de homem.",
 	"chapel_gate": "Um portão de ferro com cadeado em forma de cruz. Do outro lado, o padre continua rezando.",
 }
 
@@ -398,6 +407,14 @@ func _reward(id: String, by_host: bool) -> void:
 			hud.notify("A ESCADARIA PRINCIPAL\nO poço sai debaixo da escada do saguão. O peso no peito sumiu.")
 			subs.say("MORVANT", "Você saiu. Ninguém sai. Suba, então. Meu filho e eu esperamos no teatro.")
 			_emerge_in_foyer.call_deferred()
+		"bau":
+			State.give("chave_teatro")
+			hud.notify("A CHAVE DO TEATRO\nEstava no fundo do baú, dentro do caderno de costura.")
+			subs.say("MORVANT", "Agora você sabe para que serve uma médium. Não se preocupe: eu costuro com carinho.")
+		"luar":
+			State.set_flag("luar")
+			hud.notify("O LUAR\nA lua atravessa o mostrador e acende o olho de vidro da porta do teatro.")
+			subs.say("MORVANT", "Luz na plateia. O espetáculo vai começar.")
 		"pele":
 			hud.notify("A PELE DE HÉLIO\nUma âncora, uma rosa e a palavra \"Mãe\".")
 			subs.say("MORVANT", "Pele boa, bem curtida pelo sol. Serviu de capa para o meu diário.")
@@ -437,10 +454,12 @@ func _event(id: String) -> void:
 			Audio.play("whisper", -4.0, 1.2)
 			subs.say("OFÉLIA", ["Você ouve a gente. Eu sei que ouve. Mas só abro se disser o nome dele.", "O nome. O nome do menino do berço. Diga, e eu abro."][int(State.play_time) % 2])
 		"attic":
+			go("attic", Vector2(320, 110))
+		"theater":
 			busy = true
-			Audio.play("door", -6.0, 0.6)
-			Audio.play("cry", -10.0, 0.95)
-			subs.say("DÁLIA", "A escadaria range sob o meu peso, degrau por degrau. Lá em cima, alguém nina um bebê com uma voz que não é de ninguém.")
+			Audio.play("door", -4.0, 0.5)
+			Audio.play("cry", -6.0, 0.8)
+			subs.say("DÁLIA", "A chave entra. O olho de vidro me encara, branco de luar. A porta do teatro se abre para uma plateia em degraus, e todos os lugares estão ocupados.")
 			await subs.finished
 			var tw4 := create_tween()
 			tw4.tween_property(fade, "modulate:a", 1.0, 1.5)
@@ -488,8 +507,10 @@ func available_puzzles() -> Array:
 		"vitral": State.flag("heart_placed") and State.has("chave_capela"),
 		"ossuario": State.flag("cripta_open"),
 		"labirinto": State.flag("fundacoes_open"),
+		"bau": State.flag("sotao_open"),
+		"luar": State.flag("sotao_open"),
 	}
-	for id in ["ceia", "veias", "atlas", "prancheta", "olhos", "partitura", "banho", "caixa", "pele", "movel", "sussurros", "balanca", "ganchos", "vitral", "ossuario", "labirinto"]:
+	for id in ["ceia", "veias", "atlas", "prancheta", "olhos", "partitura", "banho", "caixa", "pele", "movel", "sussurros", "balanca", "ganchos", "vitral", "ossuario", "labirinto", "bau", "luar"]:
 		if gates[id] and not State.is_solved(id):
 			out.append(id)
 	return out

@@ -138,6 +138,20 @@ Chega-se pelo alçapão da cozinha, aberto por Ofélia. Uma **galeria de pedra e
 - **A coisa do labirinto** nunca encurrala Dália: começa na entrada, atrás dela, e é mais lenta. Os atalhos deixam rotas de fuga. A pista 2 risca setas de giz no caminho mais curto e marca a saída no mapa.
 - **Pronto:** os porões inteiros. A demonstração termina ao subir a escadaria principal para o sótão.
 
+## 6d. O sótão e a torre
+
+Chega-se pela escadaria principal do saguão, que destrava quando Dália sai do labirinto. O **sótão** é o vão do telhado em duas águas: caibros, manequins sob lençóis (um deles vira a cabeça), um cavalinho de balanço com o nome de Benjamim e o baú de Morvant. No fundo, a porta dupla do **Teatro Anatômico**, com um olho de vidro em cima e um choro de bebê atrás. À direita, a escada da **torre do relógio**: mostrador de vidro visto por trás, parado em 23h47, engrenagens enormes e um pêndulo de lâmina. Paleta quase preta e branco frio de luar; a trilha é a canção de ninar de Celeste numa caixa de música que está parando, sobre um bordão e o tique do relógio.
+
+| Cômodo | Enigma | Mecânica | Semente gera | Abre / revela |
+|---|---|---|---|---|
+| **Sótão** | **O Baú** | Cadeado de 4 discos com 6 símbolos, sem repetir. A cada tentativa os mortos respondem de dentro do baú: uma batida por símbolo no lugar certo, um arranhão por símbolo fora do lugar. 8 tentativas, depois Morvant troca a combinação | As combinações | Cena de memória: a costura do corpo de Benjamim com as peças dos mortos. A chave do teatro |
+| **Torre do relógio** | **O Luar** | Levar o raio da lua pelo mecanismo até o olho de vidro, pondo um número contado de espelhos nos vãos entre engrenagens; alguns espelhos presos atrapalham | Um caminho que funciona, engrenagens em volta, espelhos presos de distração | O olho da porta do teatro acende |
+| Teatro Anatômico | — | (próxima leva) | — | Morvant, a montagem final e os finais |
+
+- **Ordem livre:** baú e torre abrem desde a chegada. A porta do teatro precisa da chave e do luar.
+- **Pronto:** sótão e torre, com O Baú, O Luar e a memória da costura. A demonstração termina ao abrir a porta do teatro.
+- **Próxima leva:** o Teatro Anatômico (a plateia de mortos, a montagem final do corpo, o confronto com Morvant) e os três finais mais o secreto.
+
 ## 7. Arte
 
 - **Resolução:** 640×360 ampliado sem suavização. As cores são chapadas, com sombreamento em faixas, porque os planos são divididos em fatias que escurecem com a distância.
@@ -163,6 +177,7 @@ Chega-se pelo alçapão da cozinha, aberto por Ofélia. Uma **galeria de pedra e
   - **Enigma:** pulsação esparsa, vidro e grave.
   - **Cena fantasma:** cluster dissonante de cordas e coração.
   - **Porões:** cantochão de uma voz só sobre um bordão grave, com gotas d'água.
+  - **Sótão:** a canção de ninar de Celeste, lenta e desafinada, numa caixa de música que está parando, com o tique do relógio.
 - **Ambiente:** vento, rangidos aleatórios da casa, trovão distante sincronizado com o relâmpago nas janelas e relógio.
 - **Efeitos:** passos em madeira, porta rangendo, porta trancada, batida, esmagamento molhado, respingo, coração, sussurros com formantes, susto, serra de osso, tosse e grito.
 - **A risada de Morvant:** pulsos de formante "ha" que descem de tom.

@@ -11,6 +11,7 @@ const GRADES := {
 	"enigma": [Color(0.4, 0.36, 0.34), Color(1.0, 0.88, 0.7), 0.3, 1.0],
 	"quartos": [Color(0.42, 0.32, 0.56), Color(1.0, 0.82, 0.82), 0.45, 0.95],
 	"poroes": [Color(0.26, 0.34, 0.52), Color(1.0, 0.8, 0.56), 0.5, 0.88],
+	"sotao": [Color(0.3, 0.3, 0.34), Color(0.9, 0.95, 1.0), 0.5, 0.7],
 }
 
 var mat: ShaderMaterial

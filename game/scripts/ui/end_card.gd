@@ -1,5 +1,5 @@
 extends Node2D
-## Fim da demonstração: resumo da investigação e o que vem depois da escadaria.
+## Fim da demonstração: resumo da investigação e o que vem depois da porta do teatro.
 
 signal done
 
@@ -25,7 +25,7 @@ func _ready() -> void:
 	for id in ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral"]:
 		if State.is_solved(id):
 			souls += 1
-	label.text = "A ESCADARIA\n\n" + ("%d de 7 almas libertadas até aqui. " % souls) + ("Ninguém ficou para trás." if souls == 7 else "Alguém ainda espera nos cômodos que você deixou.") + "\n\nTempo: %d min   ·   Sanidade: %d%%   ·   Pistas: %d   ·   Resolvidos por Morvant: %d\n\n\nO SÓTÃO E A TORRE AINDA ESTÃO SENDO CONSTRUÍDOS\nfim da demonstração\n\n\nclique para voltar ao menu" % [mins, int(State.sanity), hints, host]
+	label.text = "O TEATRO ANATÔMICO\n\n" + ("%d de 7 almas libertadas até aqui. " % souls) + ("Ninguém ficou para trás." if souls == 7 else "Alguém ainda espera nos cômodos que você deixou.") + "\n\nTempo: %d min   ·   Sanidade: %d%%   ·   Pistas: %d   ·   Resolvidos por Morvant: %d\n\n\nO TEATRO, MORVANT E OS FINAIS AINDA ESTÃO SENDO CONSTRUÍDOS\nfim da demonstração\n\n\nclique para voltar ao menu" % [mins, int(State.sanity), hints, host]
 	add_child(label)
 	Audio.music("menu")
 
