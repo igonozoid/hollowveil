@@ -25,6 +25,8 @@ func _ready() -> void:
 	paper.position = Vector2(170, 50)
 	paper.size = Vector2(300, 250)
 	paper.hide()
+	# A folha é só desenho: o clique tem que passar para avançar a carta.
+	paper.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(paper)
 	label.position = Vector2(120, 140)
 	label.size = Vector2(400, 100)
