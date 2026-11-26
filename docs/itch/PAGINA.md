@@ -8,7 +8,7 @@ Textos prontos para colar ao criar o projeto em <https://itch.io/game/new>.
 |---|---|
 | Title | HollowVeil — A Casa Morvant |
 | Project URL | `hollowveil` |
-| Short description | Uma médium falsa, uma mansão fechada desde 1911 e sete mortos presos a enigmas. Horror em primeira pessoa, todo desenhado e tocado por código. |
+| Short description | Uma médium falsa, uma mansão fechada desde 1911 e sete mortos presos a enigmas. Horror todo feito por código. (o itch aceita até 120 caracteres) |
 | Classification | Game |
 | Kind of project | HTML (para a versão no navegador) — os arquivos de Linux e Windows entram como downloads |
 | Release status | Released |
@@ -23,6 +23,10 @@ Textos prontos para colar ao criar o projeto em <https://itch.io/game/new>.
 | Content warnings | Violência gráfica, tortura e gore (o gore pode ser desligado nas Opções); a morte de um bebê é tema da história, mostrada sem gore |
 
 > Marque a versão HTML5 como "This file will be played in the browser" e as de Linux e Windows como downloads, cada uma com sua plataforma.
+
+## Imagens
+
+Em [imagens/](imagens/): `capa_630x500.png` (capa) e oito telas em 1280×720 (`tela_*.png`).
 
 ## Descrição longa
 
