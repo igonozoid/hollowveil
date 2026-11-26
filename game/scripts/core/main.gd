@@ -72,9 +72,15 @@ func _enter_house() -> void:
 
 
 func _end() -> void:
-	State.save_game()
 	var e := EndCard.new()
-	e.done.connect(show_menu)
+	if State.last_ending != "":
+		# A volta acabou: o save some, os finais vistos ficam nas preferências.
+		e.done.connect(func():
+			State.clear_save()
+			show_menu())
+	else:
+		State.save_game()
+		e.done.connect(show_menu)
 	_swap(e)
 	post.grade("menu")
 

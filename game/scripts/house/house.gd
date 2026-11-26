@@ -25,6 +25,7 @@ const VIEWS := {
 	"crypt": preload("res://scripts/house/views/crypt.gd"),
 	"attic": preload("res://scripts/house/views/attic.gd"),
 	"clock_tower": preload("res://scripts/house/views/clock_tower.gd"),
+	"theater": preload("res://scripts/house/views/theater.gd"),
 }
 const PUZZLES := {
 	"ceia": preload("res://scripts/puzzles/ceia.gd"),
@@ -45,11 +46,12 @@ const PUZZLES := {
 	"labirinto": preload("res://scripts/puzzles/labirinto.gd"),
 	"bau": preload("res://scripts/puzzles/bau.gd"),
 	"luar": preload("res://scripts/puzzles/luar.gd"),
+	"montagem": preload("res://scripts/puzzles/montagem.gd"),
 }
 ## Enigmas que libertam uma alma (e têm cena de morte). Os outros só abrem caminho.
 const SOULS := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral"]
 ## Enigmas que levam a uma cena (almas e memórias).
-const SCENES := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral", "movel", "balanca", "ossuario", "bau"]
+const SCENES := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral", "movel", "balanca", "ossuario", "bau", "montagem"]
 const GhostStage := preload("res://scripts/ghosts/ghost_stage.gd")
 const Subtitles := preload("res://scripts/ui/subtitles.gd")
 const Hud := preload("res://scripts/ui/hud.gd")
@@ -89,6 +91,7 @@ const LOOK := {
 	"rose_after": "A rosácea brilha sozinha. A cruz, o peixe, a chave, o cálice, a estrela e o olho, cada um no seu lugar.",
 	"altar_after": "A toalha do altar está encharcada. Atrás dele, a parede parece mais fina.",
 	"small_coffin": "O forro de cetim tem a marca de um corpo do tamanho de um gato. Ainda morno. Na tampa: \"Benjamim, 1910\".",
+	"theater_table_after": "A mesa está vazia. Só ficou a linha preta, cortada em pedacinhos.",
 	"trunk_after": "O caderno de costura de Morvant. Cada página tem um nome, uma parte do corpo e um desenho de onde a linha entra.",
 	"rocking_horse": "O cavalinho tem o nome Benjamim pintado no pescoço. Nunca foi usado. A tinta da sela está riscada por unhas.",
 	"pendulum": "A lâmina do pêndulo passa a um palmo do meu rosto. Tem uma crosta escura no fio.",
@@ -331,8 +334,12 @@ func play_ghost(id: String, host_version: bool) -> void:
 	create_tween().tween_property(fade, "modulate:a", 0.0, 1.0)
 	await stage.finished
 	var tw2 := create_tween()
-	tw2.tween_property(fade, "modulate:a", 1.0, 1.0)
+	tw2.tween_property(fade, "modulate:a", 1.0, 1.0 if id != "montagem" else 2.5)
 	await tw2.finished
+	if id == "montagem":
+		# O fim da volta: a tela do final, sem voltar para a casa.
+		slice_finished.emit()
+		return
 	stage.queue_free()
 	stage = null
 	Audio.set_ambient(true)
@@ -447,7 +454,11 @@ func _event(id: String) -> void:
 			Audio.play("whisper", -6.0, 1.8)
 			if State.is_solved("partitura"):
 				subs.say("CELESTE", "...me tire daqui... devolva para a minha garganta...")
-				subs.say("DÁLIA", "A voz de Celeste. Ainda não sei como devolver. Ainda.")
+				if not State.flag("voz_celeste"):
+					State.set_flag("voz_celeste")
+					subs.say("DÁLIA", "Levo o vidro comigo, enrolado no xale. Ainda não sei como devolver. Ainda.")
+				else:
+					subs.say("DÁLIA", "O vidro está comigo. A voz bate nele por dentro, como um passarinho.")
 			else:
 				subs.say("DÁLIA", "Uma coisa pálida vibra dentro do vidro, como uma corda que alguém dedilha.")
 		"ofelia_door":
@@ -456,15 +467,14 @@ func _event(id: String) -> void:
 		"attic":
 			go("attic", Vector2(320, 110))
 		"theater":
-			busy = true
 			Audio.play("door", -4.0, 0.5)
-			Audio.play("cry", -6.0, 0.8)
-			subs.say("DÁLIA", "A chave entra. O olho de vidro me encara, branco de luar. A porta do teatro se abre para uma plateia em degraus, e todos os lugares estão ocupados.")
-			await subs.finished
-			var tw4 := create_tween()
-			tw4.tween_property(fade, "modulate:a", 1.0, 1.5)
-			await tw4.finished
-			slice_finished.emit()
+			go("theater", Vector2(320, 150))
+		"host_theater":
+			var lines := ["Não me olhe assim. Todo pai faria o mesmo. Os bons pais, pelo menos.",
+				"A mesa está esperando, médium. Ela é paciente. Eu, menos.",
+				"Sete mortos na plateia, e nenhum aplaude. Que público difícil."]
+			subs.say("MORVANT", lines[int(State.play_time) % lines.size()])
+			State.change_sanity(-1.0)
 		"gramophone":
 			Audio.play("sting", -14.0, 1.6)
 			subs.say("", "O disco gira sozinho. Uma soprano canta, longe, e para no meio da frase.")
@@ -509,8 +519,9 @@ func available_puzzles() -> Array:
 		"labirinto": State.flag("fundacoes_open"),
 		"bau": State.flag("sotao_open"),
 		"luar": State.flag("sotao_open"),
+		"montagem": State.flag("theater_seen"),
 	}
-	for id in ["ceia", "veias", "atlas", "prancheta", "olhos", "partitura", "banho", "caixa", "pele", "movel", "sussurros", "balanca", "ganchos", "vitral", "ossuario", "labirinto", "bau", "luar"]:
+	for id in ["ceia", "veias", "atlas", "prancheta", "olhos", "partitura", "banho", "caixa", "pele", "movel", "sussurros", "balanca", "ganchos", "vitral", "ossuario", "labirinto", "bau", "luar", "montagem"]:
 		if gates[id] and not State.is_solved(id):
 			out.append(id)
 	return out

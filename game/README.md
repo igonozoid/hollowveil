@@ -2,16 +2,16 @@
 
 Horror em primeira pessoa com enigmas e cenas fantasmas em vista lateral. Godot 4.7, só GDScript, sem nenhuma imagem ou som externo: os cômodos, os personagens, o sangue, a trilha e os efeitos são gerados por código. O design completo está em [../docs/design/GDD.md](../docs/design/GDD.md).
 
-Esta versão traz o **térreo**, o **1º andar** e os **porões** completos, e o começo do **sótão**:
+Esta versão traz o **jogo inteiro**, do saguão aos quatro finais:
 - **Cômodos do térreo:** saguão, porta de entrada, sala de jantar, biblioteca, cozinha, estufa e sala de música.
 - **Cômodos do 1º andar:** corredor, quartos de Celeste, de hóspedes e de Ofélia, banheiro e berçário.
 - **Cômodos dos porões:** galeria, adega, câmara fria, capela, cripta e o labirinto das fundações, em primeira pessoa. Lá embaixo, Dália carrega uma lamparina que segue o cursor.
-- **Cômodos do sótão:** o sótão e a torre do relógio.
-- **Dezoito enigmas:** A Ceia, O Atlas, Olhos no Pote, As Veias, A Prancheta, A Partitura, A Caixa de Música, O Banho, A Pele, O Móbile, Os Sussurros, A Balança, Os Ganchos, O Vitral, O Ossuário, O Labirinto, O Baú e O Luar.
+- **Cômodos do sótão:** o sótão, a torre do relógio e o Teatro Anatômico.
+- **Dezenove enigmas:** A Ceia, O Atlas, Olhos no Pote, As Veias, A Prancheta, A Partitura, A Caixa de Música, O Banho, A Pele, O Móbile, Os Sussurros, A Balança, Os Ganchos, O Vitral, O Ossuário, O Labirinto, O Baú, O Luar e A Montagem.
 - **Sete cenas de morte** (Leocádia, Tobias, Benedita, Celeste, Hélio, Ofélia e o padre Anselmo) e **quatro de memória**: o berço vazio, o vinho do jantar, o enterro de Benjamim e a costura.
 - **Sistemas:** pistas da Prancheta, sanidade e salvamento automático.
 
-A demonstração termina ao abrir a porta do Teatro Anatômico.
+- **O confronto com Morvant e quatro finais:** A Médium, A Peça Final, O Anfitrião e o secreto, A Canção. O final depende da escolha no teatro, das almas libertadas, das pistas de nível 3 e da sanidade. Ao terminar, o save da volta é apagado; os finais vistos ficam guardados.
 
 ## Jogar
 
@@ -62,9 +62,10 @@ Ele confere:
 - a Balança só se resolve com a estratégia certa, e os Ganchos pedem exatamente o mínimo de empurrões calculado;
 - toda figura do Ossuário se resolve só por linha e coluna, e no Labirinto o caminho mais curto escapa da coisa;
 - o Baú sempre abre em até 8 tentativas com palpites coerentes, e no Luar os espelhos da semente levam a lua ao olho;
+- A Montagem sempre se desfaz cortando linhas livres, e os finais seguem a regra;
 - a Prancheta dá as pistas 1 e 2 e, na terceira, Morvant resolve o enigma;
 - Esc fecha o enigma e pausa o jogo;
-- as portas e as travas respeitam o progresso, do saguão até a porta do teatro;
+- as portas e as travas respeitam o progresso, do saguão até o final;
 - salvar e carregar preservam o progresso.
 
 Com `-- --qa`, o jogo não grava o save e aceita atalhos de teste:

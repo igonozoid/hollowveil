@@ -48,7 +48,7 @@ Não há atos, capítulos nem telas de carregamento. O jogo é uma só casa, que
 | Térreo | Saguão, Sala de jantar, Biblioteca, Cozinha, Sala de música, Estufa | 6 | 4 | Desde o início |
 | 1º andar | Corredor, quartos de Celeste, Ofélia e dos hóspedes, Banheiro, Berçário vazio | 7 | 3 | 3 almas (a escada de serviço) |
 | Porões | Galeria, Adega, Câmara fria, Capela, Cripta, Labirinto das fundações | 5 | 3 | 6 almas (o alçapão da cozinha) |
-| Sótão e torre | Sótão, Teatro Anatômico, Torre do relógio | 5 | 2 + finais | 7 almas e a saída do labirinto (a escadaria principal destrava) |
+| Sótão e torre | Sótão, Torre do relógio, Teatro Anatômico | 3 | 1 + o confronto com 4 finais | 7 almas e a saída do labirinto (a escadaria principal destrava) |
 
 - **Voltar sempre vale a pena.** Andares já abertos continuam acessíveis e mudam com o progresso: sangue novo, objetos fora do lugar, sustos novos e relíquias que só aparecem depois.
 - **Cada andar tem clima próprio** (paleta, trilha e gradação de cor), que muda com uma transição suave na escada, sem corte.
@@ -66,11 +66,12 @@ O **Saguão** é o centro de tudo: a escadaria, o retrato de Morvant (cujos olho
 3. **Pistas com preço.** A primeira pista sai barata. A segunda custa mais e mostra a resposta parcial. Na terceira, Morvant resolve o enigma por você: a alma é libertada, mas a cena mostra **a versão dele** e você perde aquela lembrança, que conta para o final.
 4. **Relíquias e diário.** São 40 itens escondidos em pontos de vista secundários: páginas do diário de Morvant, fotografias e peças anatômicas. Colecionar todos abre a "Noite Mais Escura".
 5. **Revisitas que mudam.** Os cômodos mudam a cada alma libertada: sangue novo, objetos fora do lugar, uma porta que antes não existia. Sustos são agendados por progresso e sanidade, nunca por tempo fixo.
-6. **Três finais e um secreto.**
-   - *A Médium:* liberta todos, sem usar a terceira pista.
-   - *A Peça Final:* Dália é costurada ao corpo.
-   - *O Anfitrião:* Dália assume a casa.
-   - *Secreto:* exige todas as relíquias.
+6. **Três finais e um secreto.** No fim do teatro, Dália escolhe entre dizer o nome de Benjamim e pegar o bisturi.
+   - *A Médium:* dizer o nome tendo libertado as 7 almas sem a terceira pista e com sanidade de 25% ou mais.
+   - *A Peça Final:* dizer o nome sem essas condições, ou chegar ao confronto com menos de 15% de sanidade (aí não há escolha). Dália é costurada ao corpo.
+   - *O Anfitrião:* pegar o bisturi. Dália mata Morvant e assume a casa.
+   - *Secreto, A Canção:* as condições da Médium, sanidade de 60% ou mais, e ter levado o vidro com a voz de Celeste (examiná-lo no quarto dela depois de libertá-la). Celeste canta e leva o filho; Morvant fica sozinho.
+   - Os finais vistos ficam guardados com as preferências; ao terminar, o save da volta é apagado.
 
 ## 5. Navegação (o modelo híbrido)
 
@@ -146,11 +147,12 @@ Chega-se pela escadaria principal do saguão, que destrava quando Dália sai do 
 |---|---|---|---|---|
 | **Sótão** | **O Baú** | Cadeado de 4 discos com 6 símbolos, sem repetir. A cada tentativa os mortos respondem de dentro do baú: uma batida por símbolo no lugar certo, um arranhão por símbolo fora do lugar. 8 tentativas, depois Morvant troca a combinação | As combinações | Cena de memória: a costura do corpo de Benjamim com as peças dos mortos. A chave do teatro |
 | **Torre do relógio** | **O Luar** | Levar o raio da lua pelo mecanismo até o olho de vidro, pondo um número contado de espelhos nos vãos entre engrenagens; alguns espelhos presos atrapalham | Um caminho que funciona, engrenagens em volta, espelhos presos de distração | O olho da porta do teatro acende |
-| Teatro Anatômico | — | (próxima leva) | — | Morvant, a montagem final e os finais |
+| **Teatro Anatômico** | **A Montagem** | Descosturar o corpo de Benjamim: as linhas que prendem cada peça roubada se cruzam; só sai a linha que não tem nenhuma por cima (pega-varetas). Três erros e o corpo se senta, e as linhas se refazem | Posição, ângulo e ordem de cima para baixo das 14 linhas | Cada peça volta ao dono, na plateia. Depois: o confronto com Morvant, a escolha e o final |
 
 - **Ordem livre:** baú e torre abrem desde a chegada. A porta do teatro precisa da chave e do luar.
-- **Pronto:** sótão e torre, com O Baú, O Luar e a memória da costura. A demonstração termina ao abrir a porta do teatro.
-- **Próxima leva:** o Teatro Anatômico (a plateia de mortos, a montagem final do corpo, o confronto com Morvant) e os três finais mais o secreto.
+- **O Teatro:** uma plateia circular em degraus, com os mortos libertados sentados, uma claraboia de luar e a mesa de pedra no centro.
+- **Pronto:** o jogo inteiro, do saguão aos quatro finais.
+- **Ainda não feito:** as 40 relíquias e a "Noite Mais Escura" (NG+). O final secreto deixou de depender das relíquias.
 
 ## 7. Arte
 

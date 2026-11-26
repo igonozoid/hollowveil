@@ -25,6 +25,13 @@ var flash := 0.0
 var fog_alpha := 1.0
 var prop_draw: Callable
 var _playing := false
+var spectators: Array = []
+var show_body := true
+var baby_glow := 0.0
+var baby_at := Vector2(320, 220)
+var ending := ""
+var choosing := false
+signal _picked(idx: int)
 
 
 class Actor:
@@ -251,16 +258,21 @@ func _draw() -> void:
 func _draw_actor(a: Actor) -> void:
 	var k := _skeleton(a)
 	var host := a.kind == "host"
+	var alive := a.kind == "dalia"
 	var body := Color(0.03, 0.025, 0.03) if host else Color(GHOST, a.alpha)
 	var dark := Color(0.0, 0.0, 0.0) if host else Color(GHOST.darkened(0.35), a.alpha)
+	if alive:
+		# Dália, viva: a única figura com cor de gente. Casaco cor de vinho.
+		body = Color(0.55, 0.22, 0.2, a.alpha)
+		dark = Color(0.3, 0.12, 0.12, a.alpha)
 	var w := S
-	if not host:
+	if not host and not alive:
 		# Halo: o contorno pálido que tremula.
 		var halo := Color(GHOST, a.alpha * 0.12 * (0.8 + 0.2 * sin(t * 5.0)))
 		draw_circle(k["head"], 9.0 * w, halo)
 		draw_line(k["hip"], k["neck"], halo, 14.0 * w)
 	# Pernas (vestido para as mulheres)
-	if a.kind == "woman":
+	if a.kind == "woman" or alive:
 		var hem_f: Vector2 = (k["knee_f"] as Vector2).lerp(k["foot_f"], 0.8)
 		var hem_b: Vector2 = (k["knee_b"] as Vector2).lerp(k["foot_b"], 0.8)
 		var side := Vector2(6 * w, 0)
@@ -292,8 +304,8 @@ func _draw_actor(a: Actor) -> void:
 	if a.kind == "priest":
 		draw_rect(Rect2((k["neck"] as Vector2) - Vector2(1.5, 1), Vector2(3, 2)), Color(0.95, 0.95, 0.95, a.alpha))
 	# Cabeça
-	draw_circle(k["head"], 5.0 * w, body)
-	if a.kind == "woman":
+	draw_circle(k["head"], 5.0 * w, body if not alive else Color(0.86, 0.72, 0.62, a.alpha))
+	if a.kind == "woman" or alive:
 		var back := -(k["fwd"] as Vector2)
 		draw_line(k["head"] + back * 3.0, k["head"] + back * 4.0 + Vector2(0, 11), dark, 3.0 * w)
 	if host:
@@ -700,6 +712,43 @@ func _props_bau() -> void:
 	# Lamparina de pé.
 	draw_rect(Rect2(486, 214, 6, 16), Color(1.0, 0.75, 0.35))
 	draw_circle(Vector2(489, 220), 14, Color(1.0, 0.75, 0.4, 0.12))
+
+
+func _props_montagem() -> void:
+	for i in 20:
+		draw_rect(Rect2(0, i * 14, 640, 15), Color(0.07, 0.06, 0.06).lerp(Color(0.02, 0.02, 0.025), i / 19.0))
+	# Claraboia e o feixe de luar.
+	draw_circle(Vector2(330, -10), 70, Color(0.3, 0.36, 0.5))
+	draw_colored_polygon(PackedVector2Array([Vector2(280, 0), Vector2(380, 0), Vector2(430, 240), Vector2(230, 240)]), Color(0.75, 0.85, 1.0, 0.06))
+	# Plateia em degraus dos dois lados, com os mortos assistindo.
+	for side in [-1.0, 1.0]:
+		for row in 4:
+			var x0: float = 320.0 + side * (170.0 + row * 40.0)
+			var y := 236.0 - row * 34.0
+			var w := 200.0
+			var rx: float = x0 if side > 0 else x0 - w
+			draw_rect(Rect2(rx, y, w, 34 + row * 34), Color(0.18, 0.1, 0.06).darkened(row * 0.1))
+			draw_line(Vector2(rx, y), Vector2(rx + w, y), Color(0.4, 0.28, 0.16), 2.0)
+	for st in spectators:
+		var p0: Vector2 = st
+		var c := Color(0.62, 0.95, 0.9, 0.3 + 0.08 * sin(t * 1.4 + p0.x))
+		draw_rect(Rect2(p0 + Vector2(-5, -18), Vector2(10, 18)), c)
+		draw_circle(p0 + Vector2(0, -23), 5, c)
+	# A mesa de pedra no centro e o corpo desfeito.
+	draw_rect(Rect2(270, 236, 120, 8), Color(0.55, 0.55, 0.56))
+	draw_rect(Rect2(310, 244, 40, 32), Color(0.4, 0.4, 0.42))
+	if show_body:
+		draw_rect(Rect2(280, 228, 96, 8), Color(0.78, 0.7, 0.64))
+		draw_circle(Vector2(282, 228), 8, Color(0.78, 0.7, 0.64))
+		if State.gore:
+			draw_rect(Rect2(300, 236, 50, 2), Color(0.5, 0.0, 0.04))
+	# A bandeja com os instrumentos.
+	draw_rect(Rect2(400, 240, 34, 4), Color(0.6, 0.62, 0.66))
+	draw_line(Vector2(404, 238), Vector2(420, 236), Color(0.85, 0.87, 0.9), 1.0)
+	draw_rect(Rect2(414, 244, 3, 32), Color(0.5, 0.5, 0.52))
+	if baby_glow > 0.0:
+		draw_circle(baby_at, 6.0 + sin(t * 4.0), Color(1.0, 0.95, 0.8, baby_glow))
+		draw_circle(baby_at, 18.0, Color(1.0, 0.95, 0.8, baby_glow * 0.15))
 
 
 # ---------------------------------------------------------------- roteiros
@@ -1404,3 +1453,274 @@ func scene_bau() -> void:
 	_say("DÁLIA", "A última peça. Uma médium de verdade. Ele não me trouxe aqui para acalmar a casa.")
 	await _w(4.4)
 	_end()
+
+
+## Mostra os botões da escolha final e espera um clique. O Esc não pula isto.
+func _choose(options: Array) -> int:
+	skipping = false
+	var box := VBoxContainer.new()
+	box.position = Vector2(170, 120)
+	box.custom_minimum_size = Vector2(300, 0)
+	box.add_theme_constant_override("separation", 8)
+	var root := Control.new()
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.size = Vector2(640, 360)
+	add_child(root)
+	root.add_child(box)
+	for i in options.size():
+		var b := Button.new()
+		b.text = options[i]
+		b.focus_mode = Control.FOCUS_NONE
+		b.custom_minimum_size = Vector2(300, 26)
+		b.pressed.connect(func(): _picked.emit(i))
+		box.add_child(b)
+	if house and house.cursor:
+		house.cursor.mode = "hand"
+	choosing = true
+	var idx: int = await _picked
+	choosing = false
+	root.queue_free()
+	if house and house.cursor:
+		house.cursor.mode = "flame"
+	return idx
+
+
+## Os mortos libertados descem da plateia. Devolve os atores.
+func _souls_descend(xs: Array) -> Array:
+	var out: Array = []
+	var kinds := ["woman", "man", "woman", "woman", "man", "woman", "priest"]
+	for i in xs.size():
+		var a := _actor("s%d" % i, {"x": float(xs[i]), "facing": 1.0 if xs[i] < 320 else -1.0, "kind": kinds[i % kinds.size()], "alpha": 0.0})
+		_tw(a, "alpha", 0.75, 1.2)
+		out.append(a)
+	spectators = []
+	return out
+
+
+## O confronto no teatro e os quatro finais.
+func scene_montagem() -> void:
+	prop_draw = _props_montagem
+	surfaces = [Rect2(270, 236, 120, 8)]
+	blood.walls = [Rect2(60, 40, 520, 200)]
+	for k in 7:
+		var side := -1.0 if k % 2 == 0 else 1.0
+		var row := k % 3
+		spectators.append(Vector2(320.0 + side * (210.0 + row * 40.0 + (k / 2) * 18.0), 236.0 - row * 34.0))
+	var dal := _actor("dal", {"x": 120.0, "facing": 1.0, "kind": "dalia", "alpha": 1.0})
+	var host := _actor("host", {"x": 450.0, "facing": -1.0, "kind": "host"})
+	await _w(1.0)
+	_walk_to(dal, 230.0, 2.2)
+	await _w(2.4)
+	_say("MORVANT", "Você desfez o meu filho. Ponto por ponto, como quem desfaz uma bainha.")
+	await _w(4.0)
+	_say("MORVANT", "Não importa. As peças voltam para a gaveta. Mas a última peça veio sozinha até a minha mesa.")
+	await _w(4.4)
+	_say("MORVANT", "Deite-se, Dália. Você escuta os mortos. Com você, ele escuta o caminho de volta.")
+	await _w(4.4)
+	_say("DÁLIA", "Na bandeja ao lado da mesa, um bisturi. Na plateia, sete mortos esperam que eu diga alguma coisa.")
+	await _w(4.0)
+	var choice := "nome"
+	if State.sanity < 15.0:
+		_say("DÁLIA", "...não consigo... as vozes são muitas... a mesa está tão fria...")
+		await _w(3.0)
+		ending = "peca"
+	else:
+		var idx := await _choose(["Dizer o nome dele: \"Benjamim\"", "Pegar o bisturi da bandeja"])
+		choice = "nome" if idx == 0 else "bisturi"
+		ending = State.ending_for(choice)
+	match ending:
+		"medium":
+			await _end_medium(dal, host, false)
+		"cancao":
+			await _end_medium(dal, host, true)
+		"anfitriao":
+			await _end_host(dal, host)
+		_:
+			await _end_piece(dal, host, choice == "nome")
+	State.record_ending(ending)
+	_end()
+
+
+func _end_medium(dal: Actor, host: Actor, song: bool) -> void:
+	_say("DÁLIA", "Benjamim.")
+	_sfx("bell", -2.0, 0.9)
+	await _w(2.2)
+	show_body = false
+	baby_glow = 0.0
+	baby_at = Vector2(320, 224)
+	var tw := create_tween()
+	tw.tween_property(self, "baby_glow", 0.9, 1.5)
+	_sfx("cry", -6.0, 1.2)
+	_say("MORVANT", "Ali... em cima da mesa... é ele? Benjamim? Filho, o papai está...")
+	await _w(4.0)
+	var souls := _souls_descend([150, 180, 210, 260, 380, 420, 470])
+	await _w(1.6)
+	if song:
+		var cel: Actor = souls[2]
+		_walk_to(cel, 300.0, 1.6)
+		await _w(1.8)
+		_say("DÁLIA", "Abro o vidro que trouxe do quarto dela. A voz volta para a garganta de Celeste.")
+		await _w(3.6)
+		for i in 6:
+			_sfx("whisper", -6.0, 1.5 + i * 0.05)
+		_sfx("cry", -14.0, 1.4)
+		_say("CELESTE", "Dorme, Benjamim, que a noite é comprida... dorme, que a mãe fica.")
+		_tw(cel, "arm_f", 1.3, 0.6)
+		var tw2 := create_tween()
+		tw2.tween_property(self, "baby_at", Vector2(312, 196), 1.5)
+		await _w(4.2)
+		_say("MORVANT", "Celeste... me leve junto. Eu fiz tudo isso por ele. Por nós.")
+		await _w(3.8)
+		_say("CELESTE", "Não, Ezequiel. Você fica. A casa é sua. Foi você que a encheu.")
+		await _w(3.8)
+		_tw(cel, "rise", 140.0, 4.0)
+		var tw3 := create_tween()
+		tw3.tween_property(self, "baby_at", Vector2(312, 50), 4.0)
+		await _w(4.2)
+		baby_glow = 0.0
+	else:
+		var tw4 := create_tween()
+		tw4.tween_property(self, "baby_at", Vector2(320, 30), 4.0)
+		_say("DÁLIA", "Uma luz pequena sobe pela claraboia, e some no luar. Não era a coisa costurada. Era ele.")
+		await _w(4.4)
+		baby_glow = 0.0
+	# Os mortos cobram de volta o que é deles.
+	_say("MORVANT", "Não. NÃO. Fiquem nos seus lugares! Eu sou o anfitrião!")
+	for a in souls:
+		_walk_to(a, host.x + randf_range(-30, 30), 1.4)
+	await _w(1.6)
+	host.tremble = 1.0
+	_sfx("scream", 0.0, 0.7)
+	for i in 8:
+		var part_name: String = ["hand_f", "hand_b", "eyes", "mouth", "shoulder", "neck", "hip", "head"][i]
+		var at := part("host", part_name)
+		blood.spray(at, Vector2(randf_range(-1, 1), -1), 26, 190.0, 0.7, 1.8)
+		gib(at, ["hand", "hand", "eye", "tooth", "skin", "tooth", "skin", "eye"][i], Vector2(randf_range(-90, 90), randf_range(-160, -60)))
+		_sfx(["crunch", "squelch"][i % 2], -2.0, randf_range(0.7, 1.1))
+		_shake(0.6)
+		if i == 1:
+			host.hands = false
+		await _w(0.35)
+	host.tremble = 0.0
+	_tw(host, "fall", 1.0, 0.6)
+	await _w(0.7)
+	_sfx("slam", -2.0, 0.8)
+	blood.pool(Vector2(host.x + 30, FLOOR), 40.0)
+	flash = 0.5
+	await _w(1.4)
+	for a in souls:
+		_tw(a, "alpha", 0.0, 2.5)
+		_tw(a, "rise", 60.0, 2.5)
+	_tw(host, "alpha", 0.0, 3.0)
+	await _w(3.0)
+	_say("DÁLIA", "Lá embaixo, uma corrente cai no chão do saguão. A porta da frente range e abre para a manhã.")
+	await _w(4.6)
+	if song:
+		_say("DÁLIA", "No caminho de volta, a casa canta baixinho. Uma canção de ninar, afinada pela primeira vez.")
+	else:
+		_say("DÁLIA", "Eu era uma médium falsa. Agora escuto os mortos o tempo todo. Pelo menos estes foram embora.")
+	await _w(4.8)
+
+
+func _end_piece(dal: Actor, host: Actor, said_name: bool) -> void:
+	if said_name:
+		_say("DÁLIA", "Benjamim.")
+		await _w(2.0)
+		_say("MORVANT", "Bonito. Mas você não lembra de todos os rostos, médium. Ou não libertou todos. O nome não chega a ele.")
+		await _w(4.6)
+	host.tool = "garrafa"
+	_walk_to(host, 260.0, 1.2)
+	await _w(1.2)
+	host.facing = -1.0
+	_tw(host, "arm_f", 2.6, 0.12)
+	await _w(0.15)
+	_sfx("crunch", 0.0, 1.2)
+	_shake(0.8)
+	flash = 0.3
+	blood.spray(part("dal", "head"), Vector2(-1, -0.4), 30, 150.0, 0.6, 1.6)
+	dal.tremble = 1.0
+	_tw(dal, "fall", -1.0, 0.6)
+	await _w(1.0)
+	dal.tremble = 0.0
+	host.tool = ""
+	_say("MORVANT", "Shh. Láudano no vinho, láudano no lenço. Não dói. Quer dizer: dói, mas você não vai lembrar.")
+	await _w(4.0)
+	# Ele a leva até a mesa e costura.
+	_tw(dal, "x", 330.0, 0.8)
+	_tw(dal, "y", 228.0, 0.8)
+	_walk_to(host, 300.0, 0.8)
+	await _w(1.0)
+	host.facing = 1.0
+	host.tool = "agulha"
+	for i in 8:
+		_tw(host, "arm_f", 1.9 - (i % 2) * 0.6, 0.18)
+		blood.spray(part("dal", "head").lerp(part("dal", "hip"), (i % 4) / 4.0), Vector2(randf_range(-0.4, 0.4), -1), 12, 120.0, 0.7, 1.4)
+		_sfx("squelch", -4.0, randf_range(1.4, 1.8))
+		if i == 3:
+			_sfx("scream", -6.0, 1.3)
+		_shake(0.3)
+		await _w(0.4)
+	await _w(1.0)
+	_sfx("heart", -2.0, 1.1)
+	await _w(1.2)
+	_tw(dal, "fall", -0.3, 1.0)
+	await _w(1.2)
+	_sfx("cry", -4.0, 0.8)
+	_say("DÁLIA", "...Papai?")
+	await _w(3.0)
+	_sfx("laugh", -2.0, 0.8)
+	_say("MORVANT", "Bem-vindo de volta, filho. Bem-vinda, médium. Agora vocês dois escutam. E eu nunca mais fico sozinho.")
+	await _w(5.0)
+	_tw(dal, "alpha", 0.3, 2.0)
+	await _w(2.4)
+
+
+func _end_host(dal: Actor, host: Actor) -> void:
+	dal.tool = "bisturi"
+	_say("MORVANT", "Isso. Pegue. Eu sabia que você entendia de anatomia.")
+	_walk_to(dal, 400.0, 1.6)
+	await _w(1.7)
+	_tw(dal, "arm_f", 2.2, 0.12)
+	await _w(0.12)
+	_sfx("squelch", 0.0, 1.0)
+	_sfx("scream", -2.0, 0.6)
+	_shake(1.0)
+	flash = 0.4
+	var neck := part("host", "neck")
+	blood.spray(neck, Vector2(-1, -0.3), 90, 240.0, 0.4, 2.4)
+	blood.spray(neck, Vector2(1, -0.5), 40, 160.0, 0.7, 1.8)
+	host.tremble = 1.0
+	await _w(0.6)
+	for i in 5:
+		blood.spray(part("host", "neck"), Vector2(randf_range(-1, 1), 0.2), 14, 110.0, 0.5)
+		blood.drip(part("host", "neck"), 50.0)
+		await _w(0.35)
+	host.tremble = 0.0
+	_tw(host, "fall", 1.0, 0.8)
+	await _w(0.9)
+	_sfx("slam", -4.0, 0.9)
+	blood.pool(Vector2(host.x + 34, FLOOR), 44.0)
+	await _w(1.2)
+	_say("MORVANT", "...a casa... é sua... cuide bem... dos convidados...")
+	await _w(3.6)
+	_tw(host, "alpha", 0.0, 2.0)
+	dal.tool = ""
+	await _w(2.0)
+	# Dália se senta onde ele ficava. A plateia se curva.
+	_walk_to(dal, 420.0, 1.0)
+	await _w(1.0)
+	dal.facing = -1.0
+	_tw(dal, "sit", 1.0, 0.8)
+	for i in spectators.size():
+		spectators[i] = (spectators[i] as Vector2) + Vector2(0, 4)
+	_sfx("bell", -4.0, 0.6)
+	await _w(1.4)
+	_say("DÁLIA", "A casa ficou quieta. Os mortos esperam que eu diga o que fazer. E eu gosto disso.")
+	await _w(4.4)
+	_tw(dal, "alpha", 0.0, 2.0)
+	await _w(2.2)
+	_say("", "Treze anos depois.")
+	await _w(2.6)
+	_sfx("laugh", -6.0, 1.2)
+	_say("DÁLIA", "Uma médium... Enfim, alguém que escuta.")
+	await _w(4.0)

@@ -29,6 +29,10 @@ var vga := false
 var music_volume := 0.8
 var sfx_volume := 0.9
 var fullscreen := false
+## Finais já vistos (guardados com as preferências, valem entre voltas).
+var endings: Array = []
+## O final desta volta (vazio enquanto não houver).
+var last_ending := ""
 
 var qa := false
 
@@ -58,6 +62,7 @@ func new_game() -> void:
 	inventory = []
 	drafts = {}
 	play_time = 0.0
+	last_ending = ""
 	sanity_changed.emit(sanity)
 	inventory_changed.emit()
 
@@ -148,6 +153,40 @@ func save_game() -> void:
 	DirAccess.rename_absolute(ProjectSettings.globalize_path(tmp), ProjectSettings.globalize_path(SAVE_PATH))
 
 
+## Fim de uma volta: o save some e o menu volta a oferecer só "Novo jogo".
+func clear_save() -> void:
+	if qa:
+		return
+	if FileAccess.file_exists(SAVE_PATH):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
+
+
+func record_ending(id: String) -> void:
+	last_ending = id
+	if not id in endings:
+		endings.append(id)
+		if not qa:
+			save_prefs()
+
+
+## Qual final a escolha leva, dado como a volta foi jogada.
+## "nome": dizer o nome de Benjamim; "bisturi": tomar o lugar de Morvant.
+func ending_for(choice: String) -> String:
+	if choice == "bisturi":
+		return "anfitriao"
+	if sanity < 25.0:
+		return "peca"
+	for id in ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral"]:
+		if not is_solved(id):
+			return "peca"
+	for k in flags:
+		if String(k).begins_with("host_solved_"):
+			return "peca"
+	if flag("voz_celeste") and sanity >= 60.0:
+		return "cancao"
+	return "medium"
+
+
 func load_game() -> bool:
 	if not FileAccess.file_exists(SAVE_PATH):
 		return false
@@ -175,7 +214,7 @@ func save_prefs() -> void:
 		return
 	f.store_string(JSON.stringify({
 		"gore": gore, "effects": effects, "vga": vga, "music": music_volume,
-		"sfx": sfx_volume, "fullscreen": fullscreen,
+		"sfx": sfx_volume, "fullscreen": fullscreen, "finais": endings,
 	}))
 
 
@@ -191,6 +230,7 @@ func load_prefs() -> void:
 	music_volume = float(p.get("music", 0.8))
 	sfx_volume = float(p.get("sfx", 0.9))
 	fullscreen = bool(p.get("fullscreen", false))
+	endings = p.get("finais", [])
 
 
 func apply_prefs() -> void:

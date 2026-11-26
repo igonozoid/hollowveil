@@ -318,6 +318,61 @@ func _run() -> void:
 		lu.free()
 	check(bau_ok, "O Baú: tentar sempre um código coerente abre o cadeado em até 8 tentativas (pior caso: %d)" % bau_worst)
 	check(luar_ok, "O Luar: sem espelhos a lua não chega ao olho; os espelhos da semente chegam, em 60 sementes")
+	var Montagem = load("res://scripts/puzzles/montagem.gd")
+	var mont_ok := true
+	var mont_block := true
+	for s in 30:
+		State.seed_value = s * 1777 + 23
+		var mt = Montagem.new()
+		mt.rng.seed = State.puzzle_seed("montagem")
+		mt.generate()
+		# Um fio coberto não pode sair; cortando sempre um livre, o corpo se desfaz.
+		var covered := -1
+		for i in mt.threads.size():
+			if not mt.is_free(i):
+				covered = i
+				break
+		if covered >= 0:
+			var before: int = mt.errors
+			mt.errors = -99
+			mont_block = mont_block and not mt.cut(covered) and not mt.threads[covered][4]
+			mt.errors = before
+		var guard := 0
+		while not mt.done and guard < 100:
+			guard += 1
+			for i in mt.threads.size():
+				if not mt.threads[i][4] and mt.is_free(i):
+					mt.cut(i)
+					break
+		mont_ok = mont_ok and mt.done and mt.freed.size() == 7
+		mt.free()
+	check(mont_ok, "A Montagem: cortar sempre uma linha livre desfaz o corpo e solta as 7 peças, em 30 sementes")
+	check(mont_block, "A Montagem: uma linha com outra por cima não sai")
+	# Os finais, pela regra.
+	var keep_solved: Dictionary = State.solved.duplicate()
+	var keep_flags: Dictionary = State.flags.duplicate()
+	var keep_san: float = State.sanity
+	State.solved = {}
+	State.flags = {}
+	for id in ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vitral"]:
+		State.solved[id] = true
+	State.sanity = 80.0
+	var e_med: String = State.ending_for("nome")
+	State.flags["voz_celeste"] = true
+	var e_song: String = State.ending_for("nome")
+	State.sanity = 40.0
+	var e_song_low: String = State.ending_for("nome")
+	State.flags["host_solved_ceia"] = true
+	var e_host_helped: String = State.ending_for("nome")
+	var e_knife: String = State.ending_for("bisturi")
+	State.flags = {}
+	State.solved.erase("pele")
+	State.sanity = 90.0
+	var e_missing: String = State.ending_for("nome")
+	check(e_med == "medium" and e_song == "cancao" and e_song_low == "medium" and e_host_helped == "peca" and e_knife == "anfitriao" and e_missing == "peca", "Os finais seguem a regra: Médium, Canção, Peça Final e Anfitrião")
+	State.solved = keep_solved
+	State.flags = keep_flags
+	State.sanity = keep_san
 	check(oss_ok, "O Ossuário: toda figura se resolve só por linha e coluna (solução única), em 60 sementes")
 	check(lab_ok, "O Labirinto: o caminho mais curto chega à saída sem a coisa alcançar Dália (mínimo de %d passos)" % lab_min)
 	check(gan_ok, "Os Ganchos: a busca para trás acerta o mínimo de empurrões, em 16 sementes (mínimo %d)" % gan_min)
@@ -681,6 +736,44 @@ func _run() -> void:
 		if hs["action"] == "event:theater":
 			th_open = true
 	check(th_open, "Com a chave e o luar, a porta do teatro abre")
+
+	# 12. Teatro: montagem → confronto → escolha → final.
+	h.subs.clear()
+	h._event("theater")
+	await w(2.6)
+	check(h.view.id == "theater" and h.available_puzzles().has("montagem"), "Chega ao Teatro Anatômico; a montagem é o enigma")
+	h.subs.clear()
+	h.open_puzzle("montagem")
+	await w(0.3)
+	var mz = h.puzzle
+	var guard2 := 0
+	while not mz.done and guard2 < 100:
+		guard2 += 1
+		for i in mz.threads.size():
+			if not mz.threads[i][4] and mz.is_free(i):
+				mz.cut(i)
+				break
+	while h.stage == null:
+		await w(0.1)
+	check(h.stage.script_id == "montagem", "Descosturar o corpo leva ao confronto com Morvant")
+	h.stage.skip()
+	var ended := [false]
+	h.slice_finished.connect(func(): ended[0] = true)
+	var g4 := 0
+	while not h.stage.choosing and g4 < 300:
+		await w(0.1)
+		g4 += 1
+	check(h.stage.choosing, "O confronto termina numa escolha")
+	h.stage._picked.emit(0)
+	var guard3 := 0
+	while not ended[0] and guard3 < 600:
+		await w(0.1)
+		guard3 += 1
+		if not ended[0] and is_instance_valid(h) and h.stage and not h.stage.skipping:
+			h.stage.skip()
+	# Esta volta deixou o Atlas para trás e pediu a Morvant a Ceia: o nome não basta.
+	check(ended[0] and State.last_ending == "peca", "Dizer o nome sem libertar todos leva à Peça Final")
+	check("peca" in State.endings, "O final fica registrado entre os finais vistos")
 
 	# 12. Salvar e carregar.
 	State.qa = false
