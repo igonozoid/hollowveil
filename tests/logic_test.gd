@@ -429,6 +429,32 @@ func _run() -> void:
 	State.dark_night = false
 	State.sanity = s_before
 	check(is_equal_approx(dark_loss, 15.0) and dark_madness >= 0.25, "Na Noite Mais Escura a sanidade cai 50% mais e a loucura nunca zera")
+	# Dificuldade e o cheat "deus".
+	var s1: float = State.sanity
+	State.difficulty = 2
+	State.change_sanity(-10.0)
+	var cruel: float = s1 - State.sanity
+	State.difficulty = 0
+	State.sanity = s1
+	State.change_sanity(-10.0)
+	var branda: float = s1 - State.sanity
+	State.difficulty = 1
+	State.sanity = s1
+	State.god = true
+	State.change_sanity(-30.0)
+	var god_ok: bool = is_equal_approx(State.sanity, s1)
+	State.god = false
+	check(is_equal_approx(cruel, 14.0) and is_equal_approx(branda, 6.0) and god_ok, "Dificuldade muda o quanto a sanidade cai; o cheat deus trava a sanidade")
+	# Mapa: o saguão aparece visitado; viajar por ele troca de cômodo.
+	check(State.flag("visited_foyer"), "Cômodos visitados ficam marcados para o mapa")
+	h.open_map()
+	check(h.mode == "map" and h.house_map != null, "M abre o mapa da casa")
+	h.close_map()
+	check(h.mode == "explore", "O mapa fecha e volta à exploração")
+	# Console: comando desconhecido não quebra; "pista" lê as dicas.
+	main.console._run("comando_que_nao_existe")
+	main.console._run("pista")
+	check(main.console.lines.size() >= 3 and not get_tree().paused, "O console de cheats responde aos comandos")
 	var s0 := State.sanity
 	h._event("planchette")
 	check(State.hint_level("ceia") == 1 and State.sanity < s0, "Pista 1 custa sanidade")

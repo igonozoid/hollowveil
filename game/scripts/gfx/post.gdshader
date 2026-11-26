@@ -16,6 +16,10 @@ uniform float madness = 0.0;
 uniform float shock = 0.0;
 uniform float flash = 0.0;
 uniform float vga = 0.0;
+// Batida do coração (0..1) quando a sanidade está baixa.
+uniform float heartbeat = 0.0;
+// Filme antigo: riscos, poeira e oscilação de brilho (0 desliga).
+uniform float film = 0.0;
 
 float luma(vec3 c) { return dot(c, vec3(0.299, 0.587, 0.114)); }
 
@@ -68,6 +72,23 @@ void fragment() {
 	float edge = dot(v, v) * 2.4;
 	col = mix(col, vec3(0.35, 0.0, 0.02), clamp(m * edge * (0.7 + 0.3 * sin(TIME * 3.0)), 0.0, 0.8));
 	col *= 1.0 - vignette * smoothstep(0.15, 0.8, dot(v * vec2(1.0, 0.85), v * vec2(1.0, 0.85)) * 2.0);
+	// A cada batida, as bordas fecham e avermelham.
+	float hb = heartbeat * smoothstep(0.05, 0.6, dot(v, v) * 2.2);
+	col = mix(col, col * vec3(0.55, 0.12, 0.12), hb * 0.75);
+	if (film > 0.0) {
+		float frame = floor(TIME * 18.0);
+		// Riscos verticais que aparecem e somem a cada quadro.
+		for (int k = 0; k < 2; k++) {
+			float sx = hash(vec2(frame, float(k) * 7.1));
+			float on = step(0.72, hash(vec2(frame * 1.3, float(k))));
+			float d = abs(uv.x - sx);
+			col += vec3(0.16) * on * film * (1.0 - smoothstep(0.0, px.x * 1.2, d)) * step(hash(vec2(frame, 3.0)) * 0.6, uv.y);
+		}
+		// Poeira e fios de cabelo na película.
+		float speck = step(0.9993, hash(floor(uv / px / 2.0) + frame * 13.0));
+		col = mix(col, vec3(0.02), speck * film);
+		col *= 1.0 - film * 0.05 * hash(vec2(frame, 1.0));
+	}
 	col += (hash(uv * 640.0 + fract(TIME) * 37.0) - 0.5) * grain;
 	col += vec3(0.75, 0.8, 1.0) * flash;
 	if (vga > 0.5) {

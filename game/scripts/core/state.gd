@@ -33,6 +33,19 @@ var vga := false
 var music_volume := 0.8
 var sfx_volume := 0.9
 var fullscreen := false
+## Riscos e poeira de filme antigo no pós-processamento.
+var film := true
+## Nítida: desenha na resolução da tela (texto e linhas finos, mais pesado).
+var sharp := false
+## Legendas: 0 normal, 1 grande. Velocidade: 0 lenta, 1 normal, 2 rápida.
+var sub_size := 0
+var sub_speed := 1
+## Quanto a sanidade cai: 0 branda, 1 normal, 2 cruel.
+var difficulty := 1
+## Clarões dos relâmpagos (desligar ajuda quem é sensível a luz piscando).
+var flashes := true
+## Transições rápidas entre os cômodos.
+var fast_moves := false
 ## Finais já vistos (guardados com as preferências, valem entre voltas).
 var endings: Array = []
 ## Todas as relíquias já achadas, somando todas as voltas.
@@ -41,6 +54,8 @@ var relics_all: Array = []
 var last_ending := ""
 
 var qa := false
+## Cheat "deus": a sanidade não cai.
+var god := false
 
 
 func _ready() -> void:
@@ -116,9 +131,13 @@ func use_hint(id: String) -> int:
 
 # ---------------------------------------------------------------- sanidade
 func change_sanity(amount: float) -> void:
+	if god and amount < 0.0:
+		return
 	# Na Noite Mais Escura, tudo que machuca machuca mais.
 	if dark_night and amount < 0.0:
 		amount *= 1.5
+	if amount < 0.0:
+		amount *= [0.6, 1.0, 1.4][clampi(difficulty, 0, 2)]
 	var before := sanity
 	sanity = clampf(sanity + amount, 0.0, 100.0)
 	if not is_equal_approx(before, sanity):
@@ -250,7 +269,7 @@ func save_prefs() -> void:
 		return
 	f.store_string(JSON.stringify({
 		"gore": gore, "effects": effects, "vga": vga, "music": music_volume,
-		"sfx": sfx_volume, "fullscreen": fullscreen, "finais": endings, "reliquias": relics_all,
+		"sfx": sfx_volume, "fullscreen": fullscreen, "film": film, "sharp": sharp, "sub_size": sub_size, "sub_speed": sub_speed, "difficulty": difficulty, "flashes": flashes, "fast_moves": fast_moves, "finais": endings, "reliquias": relics_all,
 	}))
 
 
@@ -266,11 +285,20 @@ func load_prefs() -> void:
 	music_volume = float(p.get("music", 0.8))
 	sfx_volume = float(p.get("sfx", 0.9))
 	fullscreen = bool(p.get("fullscreen", false))
+	film = bool(p.get("film", true))
+	sharp = bool(p.get("sharp", false))
+	sub_size = int(p.get("sub_size", 0))
+	sub_speed = int(p.get("sub_speed", 1))
+	difficulty = int(p.get("difficulty", 1))
+	flashes = bool(p.get("flashes", true))
+	fast_moves = bool(p.get("fast_moves", false))
 	endings = p.get("finais", [])
 	relics_all = p.get("reliquias", [])
 
 
 func apply_prefs() -> void:
+	if is_inside_tree():
+		get_tree().root.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS if sharp else Window.CONTENT_SCALE_MODE_VIEWPORT
 	if DisplayServer.get_name() != "headless":
 		var mode := DisplayServer.WINDOW_MODE_FULLSCREEN if fullscreen else DisplayServer.WINDOW_MODE_WINDOWED
 		if DisplayServer.window_get_mode() != mode:

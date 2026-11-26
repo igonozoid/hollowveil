@@ -19,6 +19,10 @@ var shock := 0.0
 var flash := 0.0
 var rect: ColorRect
 var _grade_amount := 0.4
+## A casa liga isto: o coração só bate (e se ouve) durante o jogo.
+var in_house := false
+var _beat_phase := 0.0
+var _beat := 0.0
 
 
 func _ready() -> void:
@@ -61,3 +65,16 @@ func _process(delta: float) -> void:
 	mat.set_shader_parameter("vignette", 0.55 * on)
 	mat.set_shader_parameter("grain", 0.03 * on)
 	mat.set_shader_parameter("grade_amount", _grade_amount * on)
+	mat.set_shader_parameter("film", (0.6 if State.film else 0.0) * on)
+	# Coração: começa a bater quando a sanidade passa da metade e acelera.
+	var m := State.madness() if in_house else 0.0
+	if m > 0.5:
+		var rate := lerpf(1.0, 2.4, (m - 0.5) * 2.0)
+		var before := _beat_phase
+		_beat_phase = fmod(_beat_phase + delta * rate, 1.0)
+		if _beat_phase < before and not get_tree().paused:
+			Audio.play("heart", lerpf(-20.0, -8.0, (m - 0.5) * 2.0), 1.0)
+		_beat = maxf(0.0, 1.0 - _beat_phase * 4.0) + maxf(0.0, 1.0 - absf(_beat_phase - 0.28) * 5.0) * 0.6
+	else:
+		_beat = move_toward(_beat, 0.0, delta * 2.0)
+	mat.set_shader_parameter("heartbeat", _beat * clampf((m - 0.45) * 2.0, 0.0, 1.0) * on)

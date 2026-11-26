@@ -111,7 +111,7 @@ func _process(delta: float) -> void:
 		if _thunder_t <= 0.0:
 			_thunder_t = randf_range(18.0, 40.0)
 			var strength := randf_range(0.5, 1.0)
-			lightning.emit(strength)
+			lightning.emit(strength if State.flashes else 0.0)
 			get_tree().create_timer(randf_range(0.3, 1.4)).timeout.connect(
 				func(): play("thunder", lerpf(-14.0, -4.0, strength), randf_range(0.8, 1.1)))
 

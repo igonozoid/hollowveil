@@ -80,7 +80,7 @@ func _on_new() -> void:
 func _open_options() -> void:
 	box.hide()
 	options = Options.new()
-	options.position = Vector2(40, 120)
+	options.position = Vector2(105, 26)
 	ui.add_child(options)
 	options.back.connect(func():
 		options.queue_free()

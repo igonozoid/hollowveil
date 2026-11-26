@@ -60,6 +60,10 @@ Cada um dos sete mortos está preso a um cômodo por um enigma. Resolvido o enig
 - **Pistas da Prancheta**, em três níveis. Na terceira, Morvant resolve por você, e cobra.
 - **4 finais**, um deles secreto.
 - **40 relíquias** escondidas (o diário de Morvant, fotografias, peças) e **A Noite Mais Escura**, uma segunda volta mais cruel.
+- **Mapa da casa** com os cômodos visitados, as almas e as relíquias de cada um; clique num cômodo para ir direto até ele.
+- **Efeitos:** coração que bate na vinheta quando a sanidade cai, sangue na lente nos sustos, filme antigo, fumaça das velas e cartões de andar.
+- **Opções:** resolução Leve ou Nítida, dificuldade, legendas grandes e velocidade das falas, clarões dos relâmpagos, filme antigo, Modo VGA e transições rápidas.
+- **Console de cheats** (tecla `=`): `deus`, `resolver`, `ir capela`, `abrir`, `reliquias`, `final medium` e outros.
 - **Tudo feito por código:** nenhuma imagem ou som externo. Cômodos, personagens, luzes, música e efeitos são gerados pelo próprio jogo, em 640×360 ampliado, com Modo VGA opcional.
 
 ## 🎮 Como jogar
@@ -68,7 +72,9 @@ Cada um dos sete mortos está preso a um cômodo por um enigma. Resolvido o enig
 |---|---|
 | Andar, examinar, abrir enigma, adiantar fala | clique (o cursor muda conforme a ação) |
 | Sair do enigma, pular cena, pausar | Esc |
+| Mapa da casa (e viagem rápida) | M, ou Esc → Mapa |
 | Relicário | Esc → Relicário |
+| Console de cheats | = (digite `ajuda`) |
 | Tela cheia | F11 |
 
 Travou? O [walkthrough](docs/WALKTHROUGH.md) tem a rota, o método de cada enigma, os finais e as 40 relíquias (com spoilers).

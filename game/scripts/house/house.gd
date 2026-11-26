@@ -56,6 +56,9 @@ const GhostStage := preload("res://scripts/ghosts/ghost_stage.gd")
 const Subtitles := preload("res://scripts/ui/subtitles.gd")
 const Hud := preload("res://scripts/ui/hud.gd")
 const Relics := preload("res://scripts/core/relics.gd")
+const ScreenBlood := preload("res://scripts/gfx/screen_blood.gd")
+const FloorCard := preload("res://scripts/ui/floor_card.gd")
+const HouseMap := preload("res://scripts/ui/house_map.gd")
 
 const LOOK := {
 	"door": "Acorrentada. Por dentro. As correntes estão mornas, como se alguém tivesse acabado de segurá-las.",
@@ -129,6 +132,12 @@ var mode := "explore"
 var puzzle: Control = null
 var stage: Node2D = null
 var _last_hot := {}
+var screen_blood: CanvasLayer
+var floor_card: CanvasLayer
+var map_layer := CanvasLayer.new()
+var house_map: Control = null
+var _floor := ""
+var _last_sanity := 100.0
 
 
 func _ready() -> void:
@@ -153,10 +162,33 @@ func _ready() -> void:
 	hover_label.add_theme_color_override("font_color", Color(0.95, 0.82, 0.6))
 	hover_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud.add_child(hover_label)
+	screen_blood = ScreenBlood.new()
+	add_child(screen_blood)
+	floor_card = FloorCard.new()
+	add_child(floor_card)
+	map_layer.layer = 10
+	add_child(map_layer)
+	_last_sanity = State.sanity
+	State.sanity_changed.connect(_on_sanity)
+	if post:
+		post.in_house = true
 	Audio.set_ambient(true)
 	Audio.warm(["enigma", "fantasma"])
 	_show_view(State.view)
 	create_tween().tween_property(fade, "modulate:a", 0.0, 1.2).from(1.0)
+
+
+## Sustos que mordem a sanidade respingam sangue na lente.
+func _on_sanity(v: float) -> void:
+	var loss := _last_sanity - v
+	_last_sanity = v
+	if loss >= 3.5:
+		screen_blood.splash(clampf(loss / 12.0, 0.2, 1.0))
+
+
+func _exit_tree() -> void:
+	if post:
+		post.in_house = false
 
 
 func _show_view(id: String) -> void:
@@ -165,6 +197,13 @@ func _show_view(id: String) -> void:
 	view = VIEWS.get(id, VIEWS["foyer"]).new()
 	view_root.add_child(view)
 	State.view = view.id
+	State.set_flag("visited_" + view.id)
+	if floor_card:
+		if view.grade != _floor:
+			_floor = view.grade
+			floor_card.show_floor(_floor)
+		else:
+			floor_card.show_room(view.title)
 	Audio.music(view.music)
 	if post:
 		post.grade(view.grade if view else "terreo")
@@ -194,6 +233,11 @@ func _process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if mode == "map":
+		if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_M:
+			close_map()
+			get_viewport().set_input_as_handled()
+		return
 	if mode != "explore" or busy:
 		if mode == "ghost" and event is InputEventMouseButton and event.pressed:
 			subs.advance()
@@ -206,6 +250,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		var h: Dictionary = view.hotspot_at(event.position)
 		if not h.is_empty():
 			_act(h)
+		get_viewport().set_input_as_handled()
+	elif event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_M:
+		open_map()
 		get_viewport().set_input_as_handled()
 	elif State.qa and event is InputEventKey and event.pressed:
 		_qa_key(event.keycode)
@@ -244,6 +291,48 @@ func _take_relic(rid: String) -> void:
 	view.queue_redraw()
 
 
+# ---------------------------------------------------------------- mapa
+
+func open_map() -> void:
+	if mode != "explore" or busy or house_map:
+		return
+	mode = "map"
+	subs.clear()
+	cursor.mode = "flame"
+	Audio.play("card", -6.0, 0.8)
+	house_map = HouseMap.new()
+	house_map.travel.connect(_travel)
+	house_map.closed.connect(close_map)
+	house_map.modulate.a = 0.0
+	map_layer.add_child(house_map)
+	create_tween().tween_property(house_map, "modulate:a", 1.0, 0.25)
+
+
+func close_map() -> void:
+	if house_map:
+		house_map.queue_free()
+		house_map = null
+	if mode == "map":
+		mode = "explore"
+
+
+## Viagem pelo mapa: escurece, troca de cômodo e clareia (sem avanço de câmera).
+func _travel(target: String) -> void:
+	close_map()
+	busy = true
+	var tw := create_tween()
+	tw.tween_property(fade, "modulate:a", 1.0, 0.45)
+	await tw.finished
+	_show_view(target)
+	Audio.play("step2", -7.0)
+	var tw2 := create_tween()
+	tw2.tween_property(fade, "modulate:a", 0.0, 0.5)
+	await tw2.finished
+	busy = false
+	State.save_game()
+	view.entered(self)
+
+
 # ---------------------------------------------------------------- vistas
 
 func go(target: String, focus: Vector2 = Vector2(320, 180)) -> void:
@@ -253,6 +342,7 @@ func go(target: String, focus: Vector2 = Vector2(320, 180)) -> void:
 	subs.clear()
 	Audio.play("step", -6.0, randf_range(0.9, 1.05))
 	var tw := create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	tw.set_speed_scale(2.0 if State.fast_moves else 1.0)
 	tw.tween_method(_zoom.bind(focus), 1.0, 1.45, 0.55)
 	tw.tween_property(fade, "modulate:a", 1.0, 0.5).set_delay(0.1)
 	tw.chain().tween_callback(func():
@@ -261,6 +351,7 @@ func go(target: String, focus: Vector2 = Vector2(320, 180)) -> void:
 		_show_view(target)
 		Audio.play("step2", -7.0, randf_range(0.9, 1.05))
 		var tw2 := create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tw2.set_speed_scale(2.0 if State.fast_moves else 1.0)
 		tw2.tween_method(_zoom.bind(Vector2(320, 180)), 1.12, 1.0, 0.6)
 		tw2.tween_property(fade, "modulate:a", 0.0, 0.5)
 		tw2.chain().tween_callback(func():
@@ -271,7 +362,12 @@ func go(target: String, focus: Vector2 = Vector2(320, 180)) -> void:
 
 func _zoom(s: float, focus: Vector2) -> void:
 	view_root.scale = Vector2(s, s)
+	# Com a mente cedendo, a câmera também tomba um pouco ao andar.
+	var tilt := (s - 1.0) * 0.12 * State.madness() if State.effects else 0.0
+	view_root.rotation = tilt
 	view_root.position = focus - focus * s
+	if is_equal_approx(s, 1.0):
+		view_root.rotation = 0.0
 
 
 # ---------------------------------------------------------------- enigmas

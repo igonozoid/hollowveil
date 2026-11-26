@@ -10,6 +10,7 @@ const House := preload("res://scripts/house/house.gd")
 const EndCard := preload("res://scripts/ui/end_card.gd")
 const Options := preload("res://scripts/ui/options.gd")
 const Relicario := preload("res://scripts/ui/relicario.gd")
+const CheatConsole := preload("res://scripts/ui/cheat_console.gd")
 
 var post: CanvasLayer
 var cursor: CanvasLayer
@@ -17,6 +18,7 @@ var screen: Node = null
 var pause_layer := CanvasLayer.new()
 var pause_box := VBoxContainer.new()
 var pause_options: PanelContainer = null
+var console: CanvasLayer
 
 
 func _ready() -> void:
@@ -26,6 +28,9 @@ func _ready() -> void:
 	cursor = CursorLayer.new()
 	add_child(cursor)
 	_build_pause()
+	console = CheatConsole.new()
+	console.main = self
+	add_child(console)
 	show_menu()
 
 
@@ -108,7 +113,7 @@ func _build_pause() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_color_override("font_color", Color(0.85, 0.66, 0.36))
 	pause_box.add_child(title)
-	for pair in [["Continuar", _resume], ["Relicário", _pause_relics], ["Opções", _pause_options], ["Salvar e voltar ao menu", func():
+	for pair in [["Continuar", _resume], ["Mapa da casa (M)", _pause_map], ["Relicário", _pause_relics], ["Opções", _pause_options], ["Salvar e voltar ao menu", func():
 			State.save_game()
 			show_menu()]]:
 		var b := Button.new()
@@ -134,6 +139,12 @@ func _resume() -> void:
 	pause_layer.hide()
 
 
+func _pause_map() -> void:
+	_resume()
+	if screen is House:
+		screen.open_map()
+
+
 func _pause_relics() -> void:
 	pause_box.get_parent().hide()
 	var r := Relicario.new()
@@ -146,7 +157,7 @@ func _pause_relics() -> void:
 func _pause_options() -> void:
 	pause_box.get_parent().hide()
 	pause_options = Options.new()
-	pause_options.position = Vector2(200, 90)
+	pause_options.position = Vector2(105, 26)
 	pause_layer.add_child(pause_options)
 	pause_options.back.connect(func():
 		pause_options.queue_free()
@@ -156,6 +167,12 @@ func _pause_options() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not (event is InputEventKey and event.pressed and not event.echo):
+		return
+	if event.keycode == KEY_EQUAL and not pause_layer.visible:
+		console.toggle()
+		get_viewport().set_input_as_handled()
+		return
+	if console.is_open():
 		return
 	if event.keycode == KEY_F11:
 		State.fullscreen = not State.fullscreen
@@ -173,6 +190,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			h.puzzle.closed.emit()
 		elif h.mode == "ghost" and h.stage:
 			h.stage.skip()
+		elif h.mode == "map":
+			h.close_map()
 		elif h.mode == "explore":
 			_pause()
 		get_viewport().set_input_as_handled()

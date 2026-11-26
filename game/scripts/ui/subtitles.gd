@@ -42,10 +42,23 @@ func _ready() -> void:
 	text.add_theme_font_size_override("font_size", 11)
 	box.add_child(text)
 	panel.hide()
+	State.settings_changed.connect(_apply_size)
+	_apply_size()
+
+
+## Legendas grandes: fonte maior e painel mais alto.
+func _apply_size() -> void:
+	var big := State.sub_size == 1
+	who.add_theme_font_size_override("font_size", 12 if big else 10)
+	text.add_theme_font_size_override("font_size", 14 if big else 11)
+	panel.position = Vector2(50 if big else 70, 280 if big else 296)
+	panel.size = Vector2(540 if big else 500, 70 if big else 54)
+	text.custom_minimum_size = Vector2(524 if big else 484, 46 if big else 30)
 
 
 func say(speaker: String, line: String, seconds: float = -1.0) -> void:
-	queue.append([speaker, line, seconds if seconds > 0.0 else 1.6 + line.length() * 0.055])
+	var slow: float = [1.45, 1.0, 0.7][clampi(State.sub_speed, 0, 2)]
+	queue.append([speaker, line, seconds if seconds > 0.0 else (1.6 + line.length() * 0.055) * slow])
 	if current.is_empty():
 		_next()
 
@@ -92,7 +105,7 @@ func _process(delta: float) -> void:
 		return
 	var full: String = current[1]
 	if shown < full.length():
-		shown = minf(full.length(), shown + delta * 48.0)
+		shown = minf(full.length(), shown + delta * [30.0, 48.0, 90.0][clampi(State.sub_speed, 0, 2)])
 		text.text = full.substr(0, int(shown))
 	else:
 		text.text = full

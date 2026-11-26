@@ -29,6 +29,8 @@ Com o Godot instalado normalmente, use `godot --path game`.
 |---|---|
 | Andar, examinar, abrir enigma | clique (o cursor muda conforme a ação) |
 | Adiantar fala | clique |
+| Mapa da casa | M (ou Esc → Mapa) |
+| Console de cheats | = (digite `ajuda`) |
 | Andar n'Os Ganchos | setas ou WASD (Z desfaz) |
 | Andar n'O Labirinto | W/↑ avança, S/↓ recua, A/← e D/→ viram |
 | O Ossuário | clique ou arraste põe crânios; botão direito marca com giz |

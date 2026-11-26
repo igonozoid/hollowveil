@@ -17,7 +17,9 @@
   - **Faz subir:** cada enigma resolvido (+12) e cada relíquia (+2).
   - **Pesa no final:** é preciso ter 25% ou mais para A Médium e 60% ou mais para o final secreto. Abaixo de 15%, não há escolha no fim.
 - **Prancheta.** A mesinha do saguão dá pistas do enigma atual. Na terceira, Morvant resolve o enigma por você, mas isso fecha o final A Médium. Na Noite Mais Escura não há terceira pista.
-- **Esc** sai do enigma, pula a cena ou pausa. O menu de pausa tem o **Relicário**.
+- **Esc** sai do enigma, pula a cena ou pausa. O menu de pausa tem o **Mapa** e o **Relicário**.
+- **M** abre o mapa da casa: cômodos visitados, almas libertadas e relíquias achadas em cada cômodo. Clique num cômodo visitado para ir direto até ele.
+- **=** abre o console de cheats (digite `ajuda`), para quem só quer ver a história.
 - O jogo salva sozinho a cada passo.
 
 ## Tempo de jogo estimado

@@ -80,6 +80,12 @@ func _draw_overlay() -> void:
 		var k := 1.0 + 0.25 * sin(t * 13.0 + pos.x) * sin(t * 7.1 + pos.y)
 		overlay.draw_colored_polygon(PackedVector2Array([pos + Vector2(0, -3.0 * s * k), pos + Vector2(s, 0), pos + Vector2(0, s * 0.8), pos + Vector2(-s, 0)]), Color(1.0, 0.62, 0.22))
 		overlay.draw_rect(Rect2(pos - Vector2(0.5, 1), Vector2(1, maxf(1.0, s))), Color(1, 0.95, 0.75))
+		# Fumaça fina que sobe e se desfaz.
+		if State.effects:
+			for w in 4:
+				var ph := fmod(t * 0.45 + w * 0.25 + pos.x * 0.013, 1.0)
+				var sp := pos + Vector2(sin(t * 1.3 + w * 2.0 + pos.y) * 3.0 * ph * s, -(3.0 * s + ph * 26.0 * s))
+				overlay.draw_circle(sp, 0.6 * s + ph * 2.2 * s, Color(0.7, 0.68, 0.66, 0.09 * (1.0 - ph)))
 	if flash > 0.02:
 		for g in glass:
 			overlay.draw_colored_polygon(g, Color(0.85, 0.9, 1.0, flash * 0.9))
