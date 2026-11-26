@@ -5,7 +5,7 @@ signal done
 
 const CARDS := [
 	["", "Vale Oco, 30 de outubro de 1924."],
-	["CARTA", "Sra. Ferraz,\n\nA Casa Morvant vai a leilão no dia 2. Os compradores não passam do portão. Dizem que a casa ainda janta.\n\nFaça sua sessão. Acenda suas velas. Diga a todos que os mortos foram embora. Pago o dobro.\n\n— Dr. Bento Albuquerque, advogado"],
+	["CARTA", "Sra. Ferraz,\n\nA Casa Morvant vai a leilão no dia 2. Os compradores não passam do portão. Dizem que, à noite, ainda se ouve o jantar.\n\nFaça sua sessão. Acenda suas velas. Diga a todos que os mortos foram embora. Pago o dobro.\n\n— Dr. Bento Albuquerque, advogado"],
 	["", "Treze anos antes, oito pessoas sentaram para jantar na Casa Morvant.\nNenhuma se levantou."],
 	["", "Dália Ferraz cobra por hora.\nEm vinte anos de sessões, os mortos nunca responderam."],
 	["", "Até esta noite."],
