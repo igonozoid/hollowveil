@@ -55,6 +55,7 @@ const SCENES := ["ceia", "atlas", "olhos", "partitura", "pele", "sussurros", "vi
 const GhostStage := preload("res://scripts/ghosts/ghost_stage.gd")
 const Subtitles := preload("res://scripts/ui/subtitles.gd")
 const Hud := preload("res://scripts/ui/hud.gd")
+const Relics := preload("res://scripts/core/relics.gd")
 
 const LOOK := {
 	"door": "Acorrentada. Por dentro. As correntes estão mornas, como se alguém tivesse acabado de segurá-las.",
@@ -132,7 +133,7 @@ var _last_hot := {}
 
 func _ready() -> void:
 	add_child(modulate_node)
-	modulate_node.color = Color(0.95, 0.92, 0.9)
+	modulate_node.color = Color(0.72, 0.66, 0.7) if State.dark_night else Color(0.95, 0.92, 0.9)
 	add_child(view_root)
 	puzzle_layer.layer = 5
 	add_child(puzzle_layer)
@@ -226,6 +227,21 @@ func _act(h: Dictionary) -> void:
 			open_puzzle(arg)
 		"event":
 			_event(arg)
+		"relic":
+			_take_relic(arg)
+
+
+func _take_relic(rid: String) -> void:
+	var r := Relics.by_id(rid)
+	if r.is_empty() or State.has_relic(rid):
+		return
+	State.collect_relic(rid)
+	State.change_sanity(2.0)
+	Audio.play("candle", -6.0, 1.3)
+	Audio.play("whisper", -14.0, 1.6)
+	hud.notify("%s\nRelíquia %d de 40. Releia no Relicário (Esc)." % [r[5], State.relics.size()])
+	subs.say("", String(r[6]))
+	view.queue_redraw()
 
 
 # ---------------------------------------------------------------- vistas
@@ -554,6 +570,11 @@ func hint_for(target: String) -> void:
 		if level == 2:
 			State.set_flag("hint2_" + target)
 			subs.say("MORVANT", "Mais uma vez e eu mesmo faço. Mas nada nesta casa é de graça.")
+	elif State.dark_night:
+		State.hints[target] = 2
+		subs.say("MORVANT", "Esta noite, não. Esta noite você faz sozinha.")
+		Audio.play("laugh", -8.0, 1.1)
+		State.change_sanity(-5.0)
 	else:
 		State.change_sanity(-20.0)
 		subs.say("MORVANT", "Deixe comigo, querida. Eu conheço esta peça de cor.")

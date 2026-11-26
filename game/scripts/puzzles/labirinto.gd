@@ -30,11 +30,13 @@ var caught_t := 0.0
 var bob := 0.0
 var path_hint: Array = []
 var buttons: Array = []
+var wake := WAKE
 
 
 func build() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = State.puzzle_seed("labirinto")
+	wake = 6 if State.dark_night else WAKE
 	generate(rng)
 	_restart()
 	if State.flag("hint2_labirinto"):
@@ -202,7 +204,7 @@ func move(d: int) -> bool:
 
 func _creature_turn() -> void:
 	if not creature_on:
-		if steps >= WAKE:
+		if steps >= wake:
 			creature_on = true
 			creature = start
 			Audio.play("cry", -6.0, 0.7)

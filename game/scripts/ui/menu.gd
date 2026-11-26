@@ -3,6 +3,7 @@ extends Node2D
 ## relâmpagos e uma janela que acende sozinha.
 
 signal new_game
+signal dark_game
 signal continue_game
 signal quit
 
@@ -43,6 +44,16 @@ func _ready() -> void:
 	if State.has_save():
 		_button("Continuar a investigação", func(): continue_game.emit())
 	new_b = _button("Nova investigação", _on_new)
+	if State.dark_night_open():
+		var d := _button("A Noite Mais Escura", func(): dark_game.emit())
+		d.add_theme_color_override("font_color", Color(0.85, 0.2, 0.2))
+	if not State.relics_all.is_empty() or not State.endings.is_empty():
+		var info := Label.new()
+		info.text = "Relíquias: %d de 40 · Finais: %d de 4" % [State.relics_all.size(), State.endings.size()]
+		info.add_theme_font_size_override("font_size", 8)
+		info.add_theme_color_override("font_color", Color(0.6, 0.55, 0.48))
+		info.position = Vector2(40, 326)
+		ui.add_child(info)
 	_button("Opções", _open_options)
 	_button("Sair", func(): quit.emit())
 	var foot := Label.new()

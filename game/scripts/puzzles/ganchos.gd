@@ -11,6 +11,7 @@ const H := 7
 const CELL := 32
 const ORIGIN := Vector2(176, 50)
 const CAP := 24
+const CAP_DARK := 30
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 
 var walls: Array = []        # bool por célula
@@ -37,6 +38,7 @@ func build() -> void:
 		_room_ready()
 	else:
 		var sd := State.puzzle_seed("ganchos")
+		dark = State.dark_night
 		_task = WorkerThreadPool.add_task(_gen_task.bind(sd))
 	undo_btn.text = "Desfazer"
 	undo_btn.position = Vector2(230, 334)
@@ -132,6 +134,10 @@ func reach(from: Vector2i, bs: Array) -> Dictionary:
 	return seen
 
 
+## Na Noite Mais Escura, salas mais fundas (definido antes de gerar).
+var dark := false
+
+
 func generate(rng: RandomNumberGenerator) -> void:
 	for attempt in 200:
 		walls = []
@@ -157,7 +163,7 @@ func generate(rng: RandomNumberGenerator) -> void:
 			floor_cells[i] = floor_cells[j]
 			floor_cells[j] = tmp
 		targets = floor_cells.slice(0, 3)
-		if _deepest(rng) >= 14:
+		if _deepest(rng) >= (19 if dark else 14):
 			return
 
 
@@ -209,7 +215,7 @@ func _deepest(rng: RandomNumberGenerator) -> int:
 				best = [[r, bs]]
 			elif d == best_d:
 				best.append([r, bs])
-		if d >= CAP:
+		if d >= (CAP_DARK if dark else CAP):
 			continue
 		for bi in bs.size():
 			var b: Vector2i = bs[bi]

@@ -36,7 +36,8 @@ func _ready() -> void:
 	var end_id := State.last_ending
 	if ENDINGS.has(end_id):
 		var e: Array = ENDINGS[end_id]
-		label.text = "%s\n\n%s\n\n%s\n\nFinais encontrados: %d de 4\n\n\nclique para voltar ao menu" % [e[0], e[1], stats, State.endings.size()]
+		var head: String = ("A NOITE MAIS ESCURA · " if State.dark_night else "") + String(e[0])
+		label.text = "%s\n\n%s\n\n%s\n\nRelíquias nesta volta: %d de 40   ·   Finais encontrados: %d de 4\n\n\nclique para voltar ao menu" % [head, e[1], stats, State.relics.size(), State.endings.size()]
 	else:
 		label.text = "O TEATRO ANATÔMICO\n\n" + ("%d de 7 almas libertadas até aqui. " % souls) + "\n\n" + stats + "\n\n\nclique para voltar ao menu"
 	add_child(label)

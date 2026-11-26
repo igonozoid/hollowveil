@@ -9,6 +9,7 @@ extends Node2D
 
 const Persp := preload("res://scripts/gfx/persp.gd")
 const Light := preload("res://scripts/gfx/light.gd")
+const Relics := preload("res://scripts/core/relics.gd")
 
 var id := ""
 var title := ""
@@ -48,6 +49,7 @@ func _draw() -> void:
 	hotspots.clear()
 	glass.clear()
 	paint()
+	_paint_relics()
 	_flames = p.flames.duplicate()
 	_spots = p.spots.duplicate()
 	_spawn_lights.call_deferred(p.spots.duplicate())
@@ -83,6 +85,7 @@ func _draw_overlay() -> void:
 			overlay.draw_colored_polygon(g, Color(0.85, 0.9, 1.0, flash * 0.9))
 	_rain_on_glass()
 	paint_live(overlay)
+	_relic_glints()
 	_dust()
 
 
@@ -118,6 +121,33 @@ func _dust() -> void:
 				b = maxf(b, (1.0 - d / r) * float(s[3]))
 		if b > 0.06:
 			overlay.draw_rect(Rect2(pos.round(), Vector2(1, 1)), Color(1.0, 0.86, 0.62, minf(b, 1.0) * 0.7))
+
+
+var _relic_spots: Array = []
+
+
+## Relíquias desta vista ainda não achadas: um objeto pequeno e um hotspot.
+func _paint_relics() -> void:
+	_relic_spots = []
+	for r in Relics.for_view(id):
+		if State.has_relic(r[0]):
+			continue
+		if r[4] != "" and not State.is_solved(r[4]):
+			continue
+		Relics.draw_icon(self, r[3], r[2], 0.8, 0.75)
+		hot(Rect2(r[3] - Vector2(8, 8), Vector2(16, 16)), "look", "relic:" + String(r[0]), "Alguma coisa no chão")
+		_relic_spots.append(r[3])
+
+
+## Um brilho rápido, de tempos em tempos, onde há relíquia.
+func _relic_glints() -> void:
+	for i in _relic_spots.size():
+		var ph := fmod(t * 0.35 + i * 0.37, 1.0)
+		if ph < 0.08:
+			var c: Vector2 = _relic_spots[i]
+			var k := 1.0 - absf(ph - 0.04) / 0.04
+			overlay.draw_line(c + Vector2(-5, 0) * k, c + Vector2(5, 0) * k, Color(1, 0.95, 0.8, 0.8 * k), 1.0)
+			overlay.draw_line(c + Vector2(0, -5) * k, c + Vector2(0, 5) * k, Color(1, 0.95, 0.8, 0.8 * k), 1.0)
 
 
 ## Sobrescrever: desenho estático do cômodo.

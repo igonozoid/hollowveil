@@ -9,6 +9,7 @@ const Intro := preload("res://scripts/ui/intro.gd")
 const House := preload("res://scripts/house/house.gd")
 const EndCard := preload("res://scripts/ui/end_card.gd")
 const Options := preload("res://scripts/ui/options.gd")
+const Relicario := preload("res://scripts/ui/relicario.gd")
 
 var post: CanvasLayer
 var cursor: CanvasLayer
@@ -41,6 +42,7 @@ func show_menu() -> void:
 	pause_layer.hide()
 	var m := Menu.new()
 	m.new_game.connect(_new_game)
+	m.dark_game.connect(func(): _new_game(true))
 	m.continue_game.connect(_continue)
 	m.quit.connect(func(): get_tree().quit())
 	_swap(m)
@@ -48,8 +50,8 @@ func show_menu() -> void:
 	cursor.mode = "flame"
 
 
-func _new_game() -> void:
-	State.new_game()
+func _new_game(dark: bool = false) -> void:
+	State.new_game(dark)
 	var intro := Intro.new()
 	intro.done.connect(_enter_house)
 	_swap(intro)
@@ -106,7 +108,7 @@ func _build_pause() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_color_override("font_color", Color(0.85, 0.66, 0.36))
 	pause_box.add_child(title)
-	for pair in [["Continuar", _resume], ["Opções", _pause_options], ["Salvar e voltar ao menu", func():
+	for pair in [["Continuar", _resume], ["Relicário", _pause_relics], ["Opções", _pause_options], ["Salvar e voltar ao menu", func():
 			State.save_game()
 			show_menu()]]:
 		var b := Button.new()
@@ -130,6 +132,15 @@ func _resume() -> void:
 		pause_options = null
 	get_tree().paused = false
 	pause_layer.hide()
+
+
+func _pause_relics() -> void:
+	pause_box.get_parent().hide()
+	var r := Relicario.new()
+	pause_layer.add_child(r)
+	r.back.connect(func():
+		r.queue_free()
+		pause_box.get_parent().show())
 
 
 func _pause_options() -> void:

@@ -9,6 +9,8 @@ Esta versão traz o **jogo inteiro**, do saguão aos quatro finais:
 - **Cômodos do sótão:** o sótão, a torre do relógio e o Teatro Anatômico.
 - **Dezenove enigmas:** A Ceia, O Atlas, Olhos no Pote, As Veias, A Prancheta, A Partitura, A Caixa de Música, O Banho, A Pele, O Móbile, Os Sussurros, A Balança, Os Ganchos, O Vitral, O Ossuário, O Labirinto, O Baú, O Luar e A Montagem.
 - **Sete cenas de morte** (Leocádia, Tobias, Benedita, Celeste, Hélio, Ofélia e o padre Anselmo) e **quatro de memória**: o berço vazio, o vinho do jantar, o enterro de Benjamim e a costura.
+- **Quarenta relíquias** escondidas (páginas do diário de Morvant, fotografias e peças), relidas no **Relicário** do menu de pausa.
+- **A Noite Mais Escura:** uma segunda volta mais dura, que abre com as 40 relíquias e um final visto.
 - **Sistemas:** pistas da Prancheta, sanidade e salvamento automático.
 
 - **O confronto com Morvant e quatro finais:** A Médium, A Peça Final, O Anfitrião e o secreto, A Canção. O final depende da escolha no teatro, das almas libertadas, das pistas de nível 3 e da sanidade. Ao terminar, o save da volta é apagado; os finais vistos ficam guardados.
@@ -63,6 +65,7 @@ Ele confere:
 - toda figura do Ossuário se resolve só por linha e coluna, e no Labirinto o caminho mais curto escapa da coisa;
 - o Baú sempre abre em até 8 tentativas com palpites coerentes, e no Luar os espelhos da semente levam a lua ao olho;
 - A Montagem sempre se desfaz cortando linhas livres, e os finais seguem a regra;
+- as 40 relíquias aparecem, somem ao serem pegas e entram no Relicário; a Noite Mais Escura abre e pesa como deve;
 - a Prancheta dá as pistas 1 e 2 e, na terceira, Morvant resolve o enigma;
 - Esc fecha o enigma e pausa o jogo;
 - as portas e as travas respeitam o progresso, do saguão até o final;

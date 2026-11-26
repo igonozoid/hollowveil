@@ -384,6 +384,51 @@ func _run() -> void:
 	await w(2.5)
 	var h = main.screen
 	check(h.view.id == "foyer", "Começa no saguão")
+	# Relíquias: a tabela e a coleta.
+	var Relics = load("res://scripts/core/relics.gd")
+	var ids := {}
+	var kinds := {"diario": 0, "foto": 0, "peca": 0}
+	var rel_ok := true
+	for r in Relics.LIST:
+		ids[r[0]] = true
+		kinds[r[2]] += 1
+		rel_ok = rel_ok and h.VIEWS.has(r[1]) and (r[4] == "" or h.PUZZLES.has(r[4]))
+	check(Relics.LIST.size() == 40 and ids.size() == 40 and kinds["diario"] == 14 and kinds["foto"] == 15 and kinds["peca"] == 11 and rel_ok, "40 relíquias: 14 páginas, 15 fotografias, 11 peças, em cômodos que existem")
+	var spots := {}
+	for hs in h.view.hotspots:
+		spots[hs["action"]] = hs
+	check(spots.has("relic:foto_casamento") and not spots.has("relic:diario_1"), "No saguão, a foto do casamento aparece; a página I só depois da Ceia")
+	h._act(spots["relic:foto_casamento"])
+	await w(0.2)
+	check(State.has_relic("foto_casamento") and "foto_casamento" in State.relics_all, "Pegar a relíquia guarda nesta volta e no relicário")
+	var still := false
+	for hs in h.view.hotspots:
+		if hs["action"] == "relic:foto_casamento":
+			still = true
+	check(not still, "A relíquia achada some do cômodo")
+	h.subs.clear()
+	# A Noite Mais Escura: só abre com as 40 e um final; machuca mais.
+	var keep_all: Array = State.relics_all.duplicate()
+	var keep_end: Array = State.endings.duplicate()
+	State.relics_all = []
+	State.endings = []
+	var closed: bool = not State.dark_night_open()
+	for r in Relics.LIST:
+		State.relics_all.append(r[0])
+	var still_closed: bool = not State.dark_night_open()
+	State.endings = ["medium"]
+	var opened: bool = State.dark_night_open()
+	State.relics_all = keep_all
+	State.endings = keep_end
+	check(closed and still_closed and opened, "A Noite Mais Escura abre com as 40 relíquias e um final visto")
+	var s_before: float = State.sanity
+	State.dark_night = true
+	State.change_sanity(-10.0)
+	var dark_loss: float = s_before - State.sanity
+	var dark_madness: float = State.madness()
+	State.dark_night = false
+	State.sanity = s_before
+	check(is_equal_approx(dark_loss, 15.0) and dark_madness >= 0.25, "Na Noite Mais Escura a sanidade cai 50% mais e a loucura nunca zera")
 	var s0 := State.sanity
 	h._event("planchette")
 	check(State.hint_level("ceia") == 1 and State.sanity < s0, "Pista 1 custa sanidade")

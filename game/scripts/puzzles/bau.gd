@@ -17,6 +17,7 @@ var code: Array = []
 var guess: Array = [0, 1, 2, 3]
 var rows: Array = []        # [palpite, batidas, arranhões]
 var fixed := -1
+var tries_max := TRIES
 var try_btn := Button.new()
 var answer_t := 0.0
 var reset_t := 0.0
@@ -25,6 +26,7 @@ var sounds: Array = []      # [instante, "batida" | "arranhão" | "nada"]
 
 func build() -> void:
 	rng.seed = State.puzzle_seed("bau")
+	tries_max = 6 if State.dark_night else TRIES
 	new_code()
 	if State.flag("hint2_bau"):
 		fixed = 0
@@ -90,10 +92,10 @@ func try_guess(g: Array) -> Vector2i:
 		Audio.play("door", -4.0, 0.7)
 		say("DÁLIA", "O cadeado cede. Lá dentro: um caderno de costura, linha preta... e uma chave com um olho gravado.")
 		finish()
-	elif rows.size() >= TRIES:
+	elif rows.size() >= tries_max:
 		State.change_sanity(-8.0)
 		Audio.play("laugh", -6.0, 0.9)
-		say("MORVANT", "Oito tentativas, e nada. Vou trocar a combinação. Os mortos também cansam de bater.")
+		say("MORVANT", "Tentativas demais, e nada. Vou trocar a combinação. Os mortos também cansam de bater.")
 		reset_t = 2.0
 	return sc
 
@@ -184,7 +186,7 @@ func _draw() -> void:
 	draw_rect(lid, Color(0.2, 0.08, 0.05))
 	draw_rect(lid, Color(0.5, 0.38, 0.2), false, 2.0)
 	draw_string(font, Vector2(52, 58), "tentativas", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(0.75, 0.72, 0.65))
-	for r in TRIES:
+	for r in tries_max:
 		var y := 70.0 + r * 29.0
 		draw_line(Vector2(52, y + 24), Vector2(198, y + 24), Color(0.3, 0.14, 0.1), 1.0)
 		if r >= rows.size():

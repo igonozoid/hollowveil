@@ -18,6 +18,7 @@ const PARTS := [
 const MAX_ERRORS := 3
 
 var rng := RandomNumberGenerator.new()
+var max_errors := MAX_ERRORS
 var threads: Array = []     # [a, b, parte, z, cortada]
 var errors := 0
 var shake_t := 0.0
@@ -30,6 +31,7 @@ var flash_t := 0.0
 
 func build() -> void:
 	rng.seed = State.puzzle_seed("montagem")
+	max_errors = 2 if State.dark_night else MAX_ERRORS
 	show_free = State.flag("hint2_montagem")
 	generate()
 
@@ -93,7 +95,7 @@ func cut(i: int) -> bool:
 		State.change_sanity(-4.0)
 		Audio.play("squelch", -4.0, 0.7)
 		Audio.play("cry", -10.0, 0.7)
-		if errors >= MAX_ERRORS:
+		if errors >= max_errors:
 			sit_t = 1.5
 			Audio.play("scream", -4.0, 0.8)
 			Audio.play("laugh", -6.0, 0.9)
@@ -228,7 +230,7 @@ func _draw() -> void:
 		draw_string(font, Vector2(484, y), "%s — %s" % [PARTS[pi][1], PARTS[pi][2]], HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(0.55, 0.95, 0.88) if got else Color(0.7, 0.62, 0.52))
 		if got:
 			draw_line(Vector2(484, y - 3), Vector2(484 + 120, y - 3), Color(0.55, 0.95, 0.88, 0.5), 1.0)
-	for k in MAX_ERRORS:
+	for k in max_errors:
 		draw_rect(Rect2(40 + k * 16, 60, 10, 10), Color(0.6, 0.0, 0.04) if k < errors else Color(0.2, 0.18, 0.18))
 	draw_string(font, Vector2(40, 54), "repuxões", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color(0.6, 0.55, 0.48))
 	draw_string(font, Vector2(260, 20), "A MONTAGEM", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(0.85, 0.66, 0.36))

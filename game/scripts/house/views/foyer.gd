@@ -162,8 +162,12 @@ func paint_live(o: Node2D) -> void:
 func entered(house) -> void:
 	if not State.flag("intro_foyer"):
 		State.set_flag("intro_foyer")
-		house.subs.say("MORVANT", "Uma médium... Enfim, alguém que escuta.")
-		house.subs.say("MORVANT", "Bem-vinda à minha casa, Dália. O jantar está servido há treze anos.")
+		if State.dark_night:
+			house.subs.say("MORVANT", "De volta, médium? A casa lembra de você. E guardou rancor.")
+			house.subs.say("MORVANT", "Esta noite as velas são mais curtas. E eu não ajudo ninguém.")
+		else:
+			house.subs.say("MORVANT", "Uma médium... Enfim, alguém que escuta.")
+			house.subs.say("MORVANT", "Bem-vinda à minha casa, Dália. O jantar está servido há treze anos.")
 		house.subs.say("DÁLIA", "Truques de eco. Casas velhas falam pelos canos.")
 		house.subs.say("MORVANT", "Então vá até a mesa. Os canos estão com fome.")
 		Audio.play("laugh", -8.0, 0.9)

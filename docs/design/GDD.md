@@ -64,9 +64,10 @@ O **Saguão** é o centro de tudo: a escadaria, o retrato de Morvant (cujos olho
    - **Sanidade baixa traz:** alucinações (o cômodo distorce, vultos aparecem no canto do olho, sangue escorre das paredes e o retrato muda) e falas extras de Morvant.
    - **Efeito no final:** altera qual final o jogador recebe.
 3. **Pistas com preço.** A primeira pista sai barata. A segunda custa mais e mostra a resposta parcial. Na terceira, Morvant resolve o enigma por você: a alma é libertada, mas a cena mostra **a versão dele** e você perde aquela lembrança, que conta para o final.
-4. **Relíquias e diário.** São 40 itens escondidos em pontos de vista secundários: páginas do diário de Morvant, fotografias e peças anatômicas. Colecionar todos abre a "Noite Mais Escura".
-5. **Revisitas que mudam.** Os cômodos mudam a cada alma libertada: sangue novo, objetos fora do lugar, uma porta que antes não existia. Sustos são agendados por progresso e sanidade, nunca por tempo fixo.
-6. **Três finais e um secreto.** No fim do teatro, Dália escolhe entre dizer o nome de Benjamim e pegar o bisturi.
+4. **Relíquias e diário.** São 40 itens escondidos pelos cômodos: 14 páginas do diário de Morvant (que contam a história em ordem, de 1898 a 1924), 15 fotografias e 11 peças anatômicas. Cada uma é um objeto pequeno que brilha de vez em quando; algumas só aparecem depois de um enigma. Pegar uma devolve um pouco de sanidade. O **Relicário** (no menu de pausa) guarda todas as já achadas, somando todas as voltas.
+5. **A Noite Mais Escura.** Abre no menu quando o jogador já reuniu as 40 relíquias (em uma ou várias voltas) e viu algum final. Nela: a sanidade cai 50% mais rápido e a alucinação nunca some; a casa é mais escura; Morvant recusa a terceira pista; o Baú tem 6 tentativas, a Montagem aceita 2 erros, os Ganchos pedem salas mais fundas e a coisa do labirinto acorda antes. A tela do final marca a volta como "A Noite Mais Escura".
+6. **Revisitas que mudam.** Os cômodos mudam a cada alma libertada: sangue novo, objetos fora do lugar, uma porta que antes não existia. Sustos são agendados por progresso e sanidade, nunca por tempo fixo.
+7. **Três finais e um secreto.** No fim do teatro, Dália escolhe entre dizer o nome de Benjamim e pegar o bisturi.
    - *A Médium:* dizer o nome tendo libertado as 7 almas sem a terceira pista e com sanidade de 25% ou mais.
    - *A Peça Final:* dizer o nome sem essas condições, ou chegar ao confronto com menos de 15% de sanidade (aí não há escolha). Dália é costurada ao corpo.
    - *O Anfitrião:* pegar o bisturi. Dália mata Morvant e assume a casa.
@@ -152,7 +153,7 @@ Chega-se pela escadaria principal do saguão, que destrava quando Dália sai do 
 - **Ordem livre:** baú e torre abrem desde a chegada. A porta do teatro precisa da chave e do luar.
 - **O Teatro:** uma plateia circular em degraus, com os mortos libertados sentados, uma claraboia de luar e a mesa de pedra no centro.
 - **Pronto:** o jogo inteiro, do saguão aos quatro finais.
-- **Ainda não feito:** as 40 relíquias e a "Noite Mais Escura" (NG+). O final secreto deixou de depender das relíquias.
+- **Relíquias e Noite Mais Escura:** prontas (ver §4). O final secreto não depende das relíquias.
 
 ## 7. Arte
 

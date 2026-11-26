@@ -21,6 +21,10 @@ var hints: Dictionary = {}
 var inventory: Array = []
 var drafts: Dictionary = {}
 var play_time := 0.0
+## Relíquias achadas nesta volta.
+var relics: Array = []
+## A Noite Mais Escura: a segunda volta, mais dura.
+var dark_night := false
 
 # ---------------------------------------------------------------- preferências
 var gore := true
@@ -31,6 +35,8 @@ var sfx_volume := 0.9
 var fullscreen := false
 ## Finais já vistos (guardados com as preferências, valem entre voltas).
 var endings: Array = []
+## Todas as relíquias já achadas, somando todas as voltas.
+var relics_all: Array = []
 ## O final desta volta (vazio enquanto não houver).
 var last_ending := ""
 
@@ -50,7 +56,9 @@ func _process(delta: float) -> void:
 
 
 # ---------------------------------------------------------------- jogo novo
-func new_game() -> void:
+func new_game(dark: bool = false) -> void:
+	dark_night = dark
+	relics = []
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 	seed_value = rng.randi() % 1000000
@@ -108,6 +116,9 @@ func use_hint(id: String) -> int:
 
 # ---------------------------------------------------------------- sanidade
 func change_sanity(amount: float) -> void:
+	# Na Noite Mais Escura, tudo que machuca machuca mais.
+	if dark_night and amount < 0.0:
+		amount *= 1.5
 	var before := sanity
 	sanity = clampf(sanity + amount, 0.0, 100.0)
 	if not is_equal_approx(before, sanity):
@@ -116,7 +127,30 @@ func change_sanity(amount: float) -> void:
 
 ## 0 = lúcida, 1 = no limite. Usado pelos efeitos de alucinação.
 func madness() -> float:
-	return clampf(1.0 - sanity / 100.0, 0.0, 1.0)
+	var m := clampf(1.0 - sanity / 100.0, 0.0, 1.0)
+	return maxf(m, 0.25) if dark_night else m
+
+
+# ---------------------------------------------------------------- relíquias
+func has_relic(id: String) -> bool:
+	return id in relics
+
+
+func collect_relic(id: String) -> void:
+	if id in relics:
+		return
+	relics.append(id)
+	if not id in relics_all:
+		relics_all.append(id)
+		if not qa:
+			save_prefs()
+	flag_changed.emit("relic_" + id)
+	save_game()
+
+
+## A Noite Mais Escura abre com todas as relíquias (somando voltas) e um final visto.
+func dark_night_open() -> bool:
+	return relics_all.size() >= 40 and not endings.is_empty()
 
 
 # ---------------------------------------------------------------- inventário
@@ -142,7 +176,7 @@ func save_game() -> void:
 	var data := {
 		"schema": SCHEMA, "seed": seed_value, "view": view, "sanity": sanity,
 		"flags": flags, "solved": solved, "hints": hints, "inventory": inventory,
-		"drafts": drafts, "time": play_time,
+		"drafts": drafts, "time": play_time, "relics": relics, "dark": dark_night,
 	}
 	var tmp := SAVE_PATH + ".tmp"
 	var f := FileAccess.open(tmp, FileAccess.WRITE)
@@ -202,6 +236,8 @@ func load_game() -> bool:
 	inventory = parsed.get("inventory", [])
 	drafts = parsed.get("drafts", {})
 	play_time = float(parsed.get("time", 0.0))
+	relics = parsed.get("relics", [])
+	dark_night = bool(parsed.get("dark", false))
 	sanity_changed.emit(sanity)
 	inventory_changed.emit()
 	return true
@@ -214,7 +250,7 @@ func save_prefs() -> void:
 		return
 	f.store_string(JSON.stringify({
 		"gore": gore, "effects": effects, "vga": vga, "music": music_volume,
-		"sfx": sfx_volume, "fullscreen": fullscreen, "finais": endings,
+		"sfx": sfx_volume, "fullscreen": fullscreen, "finais": endings, "reliquias": relics_all,
 	}))
 
 
@@ -231,6 +267,7 @@ func load_prefs() -> void:
 	sfx_volume = float(p.get("sfx", 0.9))
 	fullscreen = bool(p.get("fullscreen", false))
 	endings = p.get("finais", [])
+	relics_all = p.get("reliquias", [])
 
 
 func apply_prefs() -> void:
