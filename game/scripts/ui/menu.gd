@@ -8,6 +8,7 @@ signal continue_game
 signal quit
 
 const Options := preload("res://scripts/ui/options.gd")
+const Logo := preload("res://scripts/ui/logo.gd")
 
 var t := 0.0
 var flash := 0.0
@@ -22,21 +23,9 @@ var rain: Array = []
 func _ready() -> void:
 	ui.layer = 9
 	add_child(ui)
-	var title := Label.new()
-	title.text = "HOLLOWVEIL"
-	title.add_theme_font_size_override("font_size", 44)
-	title.add_theme_color_override("font_color", Color(0.86, 0.6, 0.36))
-	title.add_theme_color_override("font_shadow_color", Color(0.25, 0.0, 0.0, 0.9))
-	title.add_theme_constant_override("shadow_offset_x", 2)
-	title.add_theme_constant_override("shadow_offset_y", 2)
-	title.position = Vector2(36, 34)
-	ui.add_child(title)
-	var sub := Label.new()
-	sub.text = "A Casa Morvant"
-	sub.add_theme_font_size_override("font_size", 14)
-	sub.position = Vector2(40, 88)
-	sub.add_theme_color_override("font_color", Color(0.75, 0.7, 0.62))
-	ui.add_child(sub)
+	var logo := Logo.new()
+	logo.position = Vector2(30, 22)
+	ui.add_child(logo)
 	box.position = Vector2(40, 130)
 	box.custom_minimum_size = Vector2(190, 0)
 	box.add_theme_constant_override("separation", 5)
